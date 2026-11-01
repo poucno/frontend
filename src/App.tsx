@@ -1,7 +1,8 @@
 import { createBrowserRouter, createRoutesFromElements, Link, NavLink, Outlet, Route, RouterProvider, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { Balloons, IslandMark, Landscape } from './components/Decorations'
+import { IslandMark, Landscape } from './components/Decorations'
 import HomePage from './pages/HomePage'
+import GamesPage from './pages/GamesPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionDashboardPage from './pages/CollectionDashboardPage'
 import CreateCollectionPage from './pages/CreateCollectionPage'
@@ -46,13 +47,9 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route path="teachers" element={<CollectionDashboardPage />} />
     <Route path="teachers/collections/new" element={<CreateCollectionPage />} />
     <Route path="teachers/collections/:collectionId/edit" element={<CollectionEditorPage />} />
+    <Route path="play" element={<GamesPage />} />
     <Route path="play/:gameName" element={<PlayPage />} />
     <Route path="play/:gameName/:collectionId" element={<PlayPage />} />
-    <Route path="preview" element={
-      <PlaceholderPage title="Lovljenje balonov" description="Predogled vprašanj je v pripravi. Igra še ni povezana." backTo="/" backLabel="Začetna stran">
-        <Balloons />
-      </PlaceholderPage>
-    } />
     <Route path="*" element={
       <PlaceholderPage title="Ta stran ne obstaja" description="Vrnimo se na otok." backTo="/" backLabel="Začetna stran" />
     } />

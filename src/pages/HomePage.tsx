@@ -27,7 +27,7 @@ export default function HomePage() {
         <div className="hero-copy">
           <h1 id="welcome-title">Znanje poleti<br />visoko!</h1>
           <p>Uči se skozi igro.</p>
-          <Link className="button hero-button" to="/preview">Razišči otok <span aria-hidden="true">→</span></Link>
+          <Link className="button hero-button" to="/play">Razišči otok <span aria-hidden="true">→</span></Link>
         </div>
         <Balloons animated motionEnabled={motionEnabled} />
       </section>
