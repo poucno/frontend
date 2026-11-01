@@ -5,8 +5,8 @@ export type GameInfo = {
 }
 
 export const GAMES: GameInfo[] = [
-  { name: 'falling_objects', title: 'Vesolsko lovljenje', thumbnail: '/thumbnails/falling_objects.png' },
-  { name: 'balloon_popping', title: 'Počenje balonov', thumbnail: '/thumbnails/balloon_popping.png' },
+  { name: 'falling_objects', title: 'Lovljenje v vesolju', thumbnail: '/thumbnails/falling_objects.png' },
+  { name: 'balloon_popping', title: 'Pokanje balonov', thumbnail: '/thumbnails/balloon_popping.png' },
 ]
 
 export function findGame(name: string): GameInfo | undefined {

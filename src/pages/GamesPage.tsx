@@ -10,10 +10,7 @@ export default function GamesPage() {
           <li key={game.name}>
             <Link className="game-pick" to={`/play/${game.name}`}>
               <img className="game-thumb" src={game.thumbnail} alt="" loading="lazy" />
-              <span className="game-pick-title">
-                <span>{game.title}</span>
-                <span aria-hidden="true">→</span>
-              </span>
+              <span className="game-pick-title">{game.title}</span>
             </Link>
           </li>
         ))}
