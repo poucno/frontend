@@ -10,6 +10,8 @@ type QuestionEditorProps = {
   onRemove: () => void
 }
 
+const ANSWER_ID_CANDIDATES = ['a', 'b', 'c', 'd', 'e']
+
 export default function QuestionEditor({ question, index, errors, onChange, onRemove }: QuestionEditorProps) {
   const prefix = `question-${question.id}`
 
@@ -19,6 +21,23 @@ export default function QuestionEditor({ question, index, errors, onChange, onRe
     const answers: Question['answers'] = [...question.answers]
     answers[answerIndex] = { ...answer, text }
     onChange({ ...question, answers })
+  }
+
+  function addAnswer() {
+    if (question.answers.length >= COLLECTION_LIMITS.maxAnswers) return
+    const used = new Set(question.answers.map(answer => answer.id))
+    const id = ANSWER_ID_CANDIDATES.find(candidate => !used.has(candidate))
+    if (!id) return
+    onChange({ ...question, answers: [...question.answers, { id, text: '' }] })
+  }
+
+  function removeAnswer(id: string) {
+    if (question.answers.length <= COLLECTION_LIMITS.minAnswers) return
+    onChange({
+      ...question,
+      answers: question.answers.filter(answer => answer.id !== id),
+      correctAnswerId: question.correctAnswerId === id ? '' : question.correctAnswerId,
+    })
   }
 
   return (
@@ -46,8 +65,14 @@ export default function QuestionEditor({ question, index, errors, onChange, onRe
               <input id={`${prefix}-answer-${answer.id}`} value={answer.text} onChange={event => changeAnswer(answerIndex, event.target.value)} required maxLength={COLLECTION_LIMITS.answer} placeholder={`Odgovor ${answerIndex + 1}`} aria-invalid={!!errors?.answers[answerIndex]} aria-describedby={errors?.answers[answerIndex] ? `${prefix}-answer-${answer.id}-error` : undefined} />
               {errors?.answers[answerIndex] && <p id={`${prefix}-answer-${answer.id}-error`} className="field-error">{errors.answers[answerIndex]}</p>}
             </div>
+            {question.answers.length > COLLECTION_LIMITS.minAnswers && (
+              <button className="answer-remove" type="button" onClick={() => removeAnswer(answer.id)} aria-label={`Odstrani odgovor ${answerIndex + 1}`}>×</button>
+            )}
           </div>
         ))}
+        {question.answers.length < COLLECTION_LIMITS.maxAnswers && (
+          <button className="button secondary-button add-answer-button" type="button" onClick={addAnswer}><span aria-hidden="true">＋</span> Dodaj odgovor</button>
+        )}
         {errors?.correctAnswerId && <p id={`${prefix}-correct-error`} className="field-error">{errors.correctAnswerId}</p>}
       </fieldset>
       <div className="form-field">

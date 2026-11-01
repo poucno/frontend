@@ -31,7 +31,7 @@ describe('question set validation', () => {
     collection.title = ' '
     collection.subject = ' '
     collection.questions[0]!.text = ' '
-    collection.questions[0]!.answers[0].text = ' '
+    collection.questions[0]!.answers[0]!.text = ' '
     const errors = validateQuestionSet(collection)
     expect(errors.title).toBeTruthy()
     expect(errors.subject).toBeTruthy()
@@ -41,7 +41,7 @@ describe('question set validation', () => {
 
   it('rejects answers that match after trimming spaces', () => {
     const collection = makeCollection()
-    collection.questions[0]!.answers[0].text = ' 24 '
+    collection.questions[0]!.answers[0]!.text = ' 24 '
     const errors = validateQuestionSet(collection).questionErrors[0]
     expect(errors?.answers[0]).toBeTruthy()
     expect(errors?.answers[1]).toBeTruthy()
@@ -56,7 +56,7 @@ describe('question set validation', () => {
   it('rejects duplicate question and answer IDs', () => {
     const collection = makeCollection()
     collection.questions.push(structuredClone(collection.questions[0]!))
-    collection.questions[0]!.answers[0].id = 'b'
+    collection.questions[0]!.answers[0]!.id = 'b'
     const errors = validateQuestionSet(collection)
     expect(errors.questionErrors[0]?.id).toBeTruthy()
     expect(errors.questionErrors[1]?.id).toBeTruthy()
@@ -64,9 +64,21 @@ describe('question set validation', () => {
     expect(errors.questionErrors[0]?.answers[1]).toBeTruthy()
   })
 
-  it('requires exactly three answers', () => {
+  it('accepts between three and five answers', () => {
     const collection = makeCollection()
-    collection.questions[0]!.answers.push({ id: 'd', text: '36' })
+    collection.questions[0]!.answers.push({ id: 'd', text: '36' }, { id: 'e', text: '42' })
+    expect(hasValidationErrors(validateQuestionSet(collection))).toBe(false)
+  })
+
+  it('rejects more than five answers', () => {
+    const collection = makeCollection()
+    collection.questions[0]!.answers.push({ id: 'd', text: '36' }, { id: 'e', text: '42' }, { id: 'f', text: '48' })
+    expect(validateQuestionSet(collection).questionErrors[0]?.answerCount).toBeTruthy()
+  })
+
+  it('rejects fewer than three answers', () => {
+    const collection = makeCollection()
+    collection.questions[0]!.answers.pop()
     expect(validateQuestionSet(collection).questionErrors[0]?.answerCount).toBeTruthy()
   })
 
@@ -74,7 +86,7 @@ describe('question set validation', () => {
     const collection = makeCollection()
     collection.title = 'x'.repeat(81)
     collection.questions[0]!.text = 'x'.repeat(201)
-    collection.questions[0]!.answers[0].text = 'x'.repeat(41)
+    collection.questions[0]!.answers[0]!.text = 'x'.repeat(41)
     collection.questions[0]!.hint = 'x'.repeat(201)
     const errors = validateQuestionSet(collection)
     expect(errors.title).toBeTruthy()
@@ -100,7 +112,7 @@ describe('question set validation', () => {
   it('trims text without mutating the draft or changing IDs and settings', () => {
     const collection = makeCollection()
     collection.title = ' Poštevanka števila 6 '
-    collection.questions[0]!.answers[1].text = ' 24 '
+    collection.questions[0]!.answers[1]!.text = ' 24 '
     collection.questions[0]!.hint = ' '
     const original = structuredClone(collection)
     const saved = trimCollection(collection)

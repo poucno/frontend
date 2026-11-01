@@ -15,8 +15,8 @@ function isQuestion(value: unknown): value is Question {
   return isObject(value)
     && typeof value.id === 'string' && value.id.trim() !== ''
     && typeof value.text === 'string'
-    && Array.isArray(value.answers) && value.answers.length === 3 && value.answers.every(isAnswer)
-    && new Set(value.answers.map(answer => answer.id)).size === 3
+    && Array.isArray(value.answers) && value.answers.length >= 3 && value.answers.length <= 5 && value.answers.every(isAnswer)
+    && new Set(value.answers.map(answer => answer.id)).size === value.answers.length
     && typeof value.correctAnswerId === 'string'
     && value.answers.some(answer => answer.id === value.correctAnswerId)
     && (value.hint === undefined || typeof value.hint === 'string')

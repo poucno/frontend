@@ -1,6 +1,6 @@
 import type { Collection, CollectionMetadata, QuestionSet } from '../types/collection'
 
-export const COLLECTION_LIMITS = { title: 80, question: 200, answer: 40, hint: 200 }
+export const COLLECTION_LIMITS = { title: 80, question: 200, answer: 40, hint: 200, minAnswers: 3, maxAnswers: 5 }
 
 export type MetadataErrors = { title?: string; subject?: string; grade?: string }
 export type QuestionErrors = {
@@ -40,7 +40,9 @@ export function validateQuestionSet(collection: QuestionSet): QuestionSetErrors 
     }
     if (!question.text.trim()) questionErrors.text = 'Vnesi vprašanje.'
     else if (question.text.trim().length > COLLECTION_LIMITS.question) questionErrors.text = 'Vprašanje je lahko dolgo največ 200 znakov.'
-    if (question.answers.length !== 3) questionErrors.answerCount = 'Vprašanje mora imeti natanko tri odgovore.'
+    if (question.answers.length < COLLECTION_LIMITS.minAnswers || question.answers.length > COLLECTION_LIMITS.maxAnswers) {
+      questionErrors.answerCount = 'Vprašanje mora imeti od 3 do 5 odgovorov.'
+    }
     const answerTexts = question.answers.map(answer => answer.text.trim())
     questionErrors.answers = question.answers.map(answer => {
       if (!answer.id.trim() || question.answers.filter(item => item.id === answer.id).length > 1) return 'Odgovor mora imeti svoj neprazen identifikator.'

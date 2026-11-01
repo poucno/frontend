@@ -6,7 +6,7 @@ export type Answer = {
 export type Question = {
   id: string
   text: string
-  answers: [Answer, Answer, Answer]
+  answers: Answer[]
   correctAnswerId: string
   hint?: string
 }
