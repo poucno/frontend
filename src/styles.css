@@ -109,11 +109,15 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
 .placeholder-card p { max-width: 52ch; margin-bottom: 24px; font-size: 20px; color: #626c82; }
 .placeholder-card p:last-child { margin-bottom: 0; }
 .placeholder-card .balloons { width: min(100%, 340px); margin: 0 auto; }
-.play-page { display: flex; flex-direction: column; padding-top: 28px; }
-.play-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; }
-.play-heading .back-link { margin-bottom: 0; }
+.play-shell { height: 100svh; display: flex; flex-direction: column; }
+.play-shell main { flex: 1; min-height: 0; padding-bottom: 0; display: flex; flex-direction: column; }
+.play-page { display: flex; flex: 1; min-height: 0; flex-direction: column; padding-top: 10px; padding-bottom: 24px; }
+.play-heading { display: flex; flex: none; align-items: center; gap: 12px; font-size: 15px; }
+.play-heading .back-link { min-height: 32px; margin-bottom: 0; font-size: 15px; }
+.play-game-title { color: #626c82; font-weight: 700; }
 .play-page h1 { font-size: clamp(28px, 5vw, 44px); }
-.game-frame { width: 100%; aspect-ratio: 16 / 9; margin-top: 20px; border: 1px solid #d9dfdf; border-radius: 24px; background: #000; box-shadow: 0 8px 28px #2b718315; }
+.game-stage { display: flex; flex: 1; min-height: 0; align-items: center; justify-content: center; margin-top: 10px; container-type: size; }
+.game-frame { width: min(100cqw, calc(100cqh * 16 / 9)); aspect-ratio: 16 / 9; border: 1px solid #d9dfdf; border-radius: 24px; background: #000; box-shadow: 0 8px 28px #2b718315; }
 .games-page { padding-top: 28px; }
 .games-page h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 24px; }
 .games-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 0; margin: 0; list-style: none; }

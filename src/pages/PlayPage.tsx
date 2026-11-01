@@ -59,7 +59,7 @@ export default function PlayPage() {
   if (!game) {
     return (
       <section className="play-page">
-        <Link className="back-link" to="/"><span aria-hidden="true">←</span> Začetna stran</Link>
+        <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
         <h1>Igra ni na voljo</h1>
         <p className="form-note">Igre »{gameName}« ni mogoče najti.</p>
       </section>
@@ -69,18 +69,20 @@ export default function PlayPage() {
   return (
     <section className="play-page" aria-labelledby="play-title">
       <div className="play-heading">
-        <Link className="back-link" to="/"><span aria-hidden="true">←</span> Začetna stran</Link>
-        <h1 id="play-title">{game.title}</h1>
+        <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
+        <span id="play-title" className="play-game-title">{game.title}</span>
       </div>
       {error && <p className="error-message">{error}</p>}
       {!error && (
-        <iframe
-          ref={iframeRef}
-          className="game-frame"
-          title={game.title}
-          src={`/games/${game.name}/index.html`}
-          allow="autoplay; fullscreen"
-        />
+        <div className="game-stage">
+          <iframe
+            ref={iframeRef}
+            className="game-frame"
+            title={game.title}
+            src={`/games/${game.name}/index.html`}
+            allow="autoplay; fullscreen"
+          />
+        </div>
       )}
       {result && (
         <p className="form-note">

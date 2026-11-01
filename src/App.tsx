@@ -12,6 +12,7 @@ import PlayPage from './pages/PlayPage'
 function Layout() {
   const { pathname } = useLocation()
   const isTeacherPage = pathname.startsWith('/teachers')
+  const isPlayPage = pathname.startsWith('/play')
   const previousPath = useRef(pathname)
 
   useEffect(() => {
@@ -23,7 +24,7 @@ function Layout() {
   }, [pathname])
 
   return (
-    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''}`}>
+    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''} ${isPlayPage ? 'play-shell' : ''}`}>
       <a className="skip-link" href="#main-content">Preskoči na vsebino</a>
       <header className="site-header">
         <Link className="brand" to="/" aria-label="Otok znanja – začetna stran">
