@@ -1,5 +1,7 @@
 import type { Collection } from '../types/collection'
 
+export const PUBLIC_TOPICS = ['matematika', 'angleščina', 'slovenščina']
+
 export const PUBLIC_COLLECTIONS: Collection[] = [
   {
     id: 'P1',
@@ -64,6 +66,32 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
       { question: 'Na kateri celini je Mount Everest?', possibleAnswers: ['Azija', 'Evropa', 'Afrika'], answer: 'Azija' },
       { question: 'Kateri je največji ocean?', possibleAnswers: ['Tihi ocean', 'Atlantski ocean', 'Indijski ocean'], answer: 'Tihi ocean' },
       { question: 'Katero je glavno mesto Italije?', possibleAnswers: ['Rim', 'Milano', 'Benetke'], answer: 'Rim' },
+    ],
+  },
+  {
+    id: 'P6',
+    name: 'Angleščina – besede',
+    subject: 'angleščina',
+    description: '',
+    questions: [
+      { question: 'Kako se v angleščini reče »hiša«?', possibleAnswers: ['house', 'horse', 'mouse'], answer: 'house' },
+      { question: 'Kako se v angleščini reče »pes«?', possibleAnswers: ['dog', 'cat', 'bird'], answer: 'dog' },
+      { question: 'Kako se v angleščini reče »knjiga«?', possibleAnswers: ['book', 'table', 'chair'], answer: 'book' },
+      { question: 'Kako se v angleščini reče »voda«?', possibleAnswers: ['water', 'fire', 'air'], answer: 'water' },
+      { question: 'Kako se v angleščini reče »šola«?', possibleAnswers: ['school', 'shop', 'street'], answer: 'school' },
+    ],
+  },
+  {
+    id: 'P7',
+    name: 'Slovenščina – besedne vrste',
+    subject: 'slovenščina',
+    description: '',
+    questions: [
+      { question: 'Katera beseda je samostalnik?', possibleAnswers: ['miza', 'teči', 'lep'], answer: 'miza' },
+      { question: 'Katera beseda je glagol?', possibleAnswers: ['peti', 'hiša', 'rdeč'], answer: 'peti' },
+      { question: 'Katera beseda je pridevnik?', possibleAnswers: ['rdeč', 'miza', 'teči'], answer: 'rdeč' },
+      { question: 'Katera beseda je samostalnik?', possibleAnswers: ['sonce', 'skakati', 'vesel'], answer: 'sonce' },
+      { question: 'Katera beseda je glagol?', possibleAnswers: ['pisati', 'knjiga', 'moder'], answer: 'pisati' },
     ],
   },
 ]

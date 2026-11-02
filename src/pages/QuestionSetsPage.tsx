@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { findGame } from '../data/games'
-import { PUBLIC_COLLECTIONS } from '../data/publicCollections'
+import { PUBLIC_COLLECTIONS, PUBLIC_TOPICS } from '../data/publicCollections'
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
 
 export default function QuestionSetsPage() {
   const { gameName = '' } = useParams()
   const game = findGame(gameName)
+  const [topic, setTopic] = useState<string | null>(null)
 
   if (!game) {
     return (
@@ -16,12 +22,23 @@ export default function QuestionSetsPage() {
     )
   }
 
+  const collections = topic
+    ? PUBLIC_COLLECTIONS.filter(collection => collection.subject === topic)
+    : PUBLIC_COLLECTIONS
+
   return (
     <section className="games-page" aria-labelledby="sets-title">
       <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
       <h1 id="sets-title">{game.title}</h1>
+      <div className="topic-filter" role="group" aria-label="Predmet">
+        <button type="button" className={`topic-chip${topic === null ? ' is-active' : ''}`} onClick={() => setTopic(null)} aria-pressed={topic === null}>Vse</button>
+        {PUBLIC_TOPICS.map(item => (
+          <button key={item} type="button" className={`topic-chip${topic === item ? ' is-active' : ''}`} onClick={() => setTopic(item)} aria-pressed={topic === item}>{capitalize(item)}</button>
+        ))}
+      </div>
+      {collections.length === 0 && <p className="form-note">Ni sklopov za ta predmet.</p>}
       <ul className="sets-list">
-        {PUBLIC_COLLECTIONS.map(collection => (
+        {collections.map(collection => (
           <li key={collection.id}>
             <Link className="set-card" to={`/play/${game.name}/${collection.id}`}>
               <span className="set-icon" aria-hidden="true">{collection.questions.length}</span>

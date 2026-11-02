@@ -120,6 +120,10 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
 .game-frame { width: min(100cqw, calc(100cqh * 16 / 9)); aspect-ratio: 16 / 9; border: 1px solid #d9dfdf; border-radius: 24px; background: #000; box-shadow: 0 8px 28px #2b718315; }
 .games-page { padding-top: 28px; }
 .games-page h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 24px; }
+.topic-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.topic-chip { min-height: 40px; padding: 8px 16px; border: 1px solid #b8c8d0; border-radius: 999px; background: #ffffffb3; color: #102451; font-size: 15px; font-weight: 600; }
+.topic-chip:hover { background: #fffdf4; }
+.topic-chip.is-active { border-color: #008f96; background: #008f96; color: white; }
 .games-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 0; margin: 0; list-style: none; }
 .game-pick { display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ffffff99; border-radius: 22px; background: #ffffff59; color: #102451; text-decoration: none; box-shadow: 0 8px 28px #2b718315; backdrop-filter: blur(8px); transition: background 150ms ease, transform 150ms ease, box-shadow 150ms ease; }
 .game-pick:hover { background: #ffffff8c; transform: translateY(-2px); box-shadow: 0 12px 32px #2b718326; }
