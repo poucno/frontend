@@ -1,9 +1,11 @@
-import { createBrowserRouter, createRoutesFromElements, Link, NavLink, Outlet, Route, RouterProvider, useLocation } from 'react-router-dom'
+import { createBrowserRouter, createRoutesFromElements, Link, NavLink, Outlet, Route, RouterProvider, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import { Balloons, IslandMark, Landscape } from './components/Decorations'
 import MotionProvider from './components/MotionProvider'
 import MotionToggle from './components/MotionToggle'
+import UserMenu from './components/UserMenu'
 import { useMotion } from './hooks/useMotion'
+import { useAuth } from './hooks/useAuth'
 import HomePage from './pages/HomePage'
 import GamesPage from './pages/GamesPage'
 import QuestionSetsPage from './pages/QuestionSetsPage'
@@ -18,12 +20,12 @@ function Layout() {
   const { pathname } = useLocation()
   const isAuthPage = pathname === '/teachers/login' || pathname === '/teachers/register'
   const isTeacherPage = pathname.startsWith('/teachers') && !isAuthPage
-  const showHomeLink = isAuthPage || isTeacherPage
-  const navigationLabel = isAuthPage ? 'Nazaj na začetek' : isTeacherPage ? 'Začetna stran' : 'Za učitelje'
   const segments = pathname.split('/').filter(Boolean)
   const isGamePage = segments[0] === 'play' && segments.length >= 3
   const previousPath = useRef(pathname)
   const { motionEnabled } = useMotion()
+  const { session, logout } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (previousPath.current === pathname) return
@@ -44,7 +46,9 @@ function Layout() {
         <div className="header-actions">
           <MotionToggle />
           <nav aria-label="Glavna navigacija">
-            <NavLink to={showHomeLink ? '/' : '/teachers/login'} end={showHomeLink}>{navigationLabel}</NavLink>
+            {session
+              ? <UserMenu email={session.email} onLogout={() => { logout(); navigate('/') }} />
+              : !isAuthPage && <NavLink to="/teachers/login">Za učitelje</NavLink>}
           </nav>
         </div>
       </header>
