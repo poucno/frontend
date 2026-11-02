@@ -12,10 +12,14 @@ import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionDashboardPage from './pages/CollectionDashboardPage'
 import CreateCollectionPage from './pages/CreateCollectionPage'
 import CollectionEditorPage from './pages/CollectionEditorPage'
+import TeacherAuthPage from './pages/TeacherAuthPage'
 
 function Layout() {
   const { pathname } = useLocation()
-  const isTeacherPage = pathname.startsWith('/teachers')
+  const isAuthPage = pathname === '/teachers/login' || pathname === '/teachers/register'
+  const isTeacherPage = pathname.startsWith('/teachers') && !isAuthPage
+  const showHomeLink = isAuthPage || isTeacherPage
+  const navigationLabel = isAuthPage ? 'Nazaj na začetek' : isTeacherPage ? 'Začetna stran' : 'Za učitelje'
   const segments = pathname.split('/').filter(Boolean)
   const isGamePage = segments[0] === 'play' && segments.length >= 3
   const previousPath = useRef(pathname)
@@ -30,7 +34,7 @@ function Layout() {
   }, [pathname])
 
   return (
-    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''} ${isGamePage ? 'play-shell' : ''}`} data-motion={motionEnabled ? 'running' : 'paused'}>
+    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''} ${isAuthPage ? 'auth-shell' : ''} ${isGamePage ? 'play-shell' : ''}`} data-motion={motionEnabled ? 'running' : 'paused'}>
       <a className="skip-link" href="#main-content">Preskoči na vsebino</a>
       <header className="site-header">
         <Link className="brand" to="/" aria-label="Otok znanja – začetna stran">
@@ -40,7 +44,7 @@ function Layout() {
         <div className="header-actions">
           <MotionToggle />
           <nav aria-label="Glavna navigacija">
-            {isTeacherPage ? <NavLink to="/" end>Začetna stran</NavLink> : <NavLink to="/teachers">Za učitelje</NavLink>}
+            <NavLink to={showHomeLink ? '/' : '/teachers/login'} end={showHomeLink}>{navigationLabel}</NavLink>
           </nav>
         </div>
       </header>
@@ -55,6 +59,8 @@ function Layout() {
 const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<Layout />}>
     <Route index element={<HomePage />} />
+    <Route path="teachers/login" element={<TeacherAuthPage key="login" mode="login" />} />
+    <Route path="teachers/register" element={<TeacherAuthPage key="register" mode="register" />} />
     <Route path="teachers" element={<CollectionDashboardPage />} />
     <Route path="teachers/collections/new" element={<CreateCollectionPage />} />
     <Route path="teachers/collections/:collectionId/edit" element={<CollectionEditorPage />} />
