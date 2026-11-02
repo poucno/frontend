@@ -313,6 +313,10 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
 .dialog-balloon { display: block; width: 44px; height: 60px; margin: 0 auto 8px; animation: bob 3s ease-in-out infinite; }
 .unsaved-dialog h2 { font-size: 26px; margin-bottom: 12px; text-align: center; }
 .unsaved-dialog p { color: var(--ink-soft); text-align: center; }
+.qr-dialog { text-align: center; }
+.qr-dialog-subject { margin-bottom: 16px; font-weight: 700; color: var(--navy); }
+.qr-dialog-code { display: inline-flex; padding: 16px; border-radius: 20px; background: #fffdf7; }
+.qr-dialog-url { margin-top: 14px; font-size: 13px; word-break: break-all; }
 .dialog-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
 .dialog-actions .button { font-size: 16px; }
 
