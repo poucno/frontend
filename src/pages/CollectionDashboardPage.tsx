@@ -5,6 +5,11 @@ import { QUESTION_FORMS, pluralSl } from '../data/plural'
 import { subjectImage } from '../data/publicCollections'
 import { UnauthorizedError, deleteCollectionById, fetchCollections } from '../data/collectionsApi'
 import type { CollectionSummary } from '../data/collectionsApi'
+import ShareQrDialog from '../components/ShareQrDialog'
+
+function playUrl(collection: CollectionSummary): string {
+  return `${window.location.origin}/play/${collection.gameId}/${collection.id}`
+}
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -35,6 +40,7 @@ export default function CollectionDashboardPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [qrCollection, setQrCollection] = useState<CollectionSummary | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
   const newCollectionLink = useRef<HTMLAnchorElement>(null)
 
@@ -81,7 +87,7 @@ export default function CollectionDashboardPage() {
   }
 
   async function handleCopy(collection: CollectionSummary) {
-    const url = `${window.location.origin}/play/${collection.gameId}/${collection.id}`
+    const url = playUrl(collection)
     const copied = await copyText(url)
     if (!copied) {
       window.prompt('Kopiraj povezavo:', url)
@@ -132,6 +138,14 @@ export default function CollectionDashboardPage() {
                     ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4L19 7" /></svg>
                     : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4" /><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L13 19" /></svg>}
                 </button>
+                <button className="button secondary-button icon-button" type="button" onClick={() => setQrCollection(collection)} disabled={collection.questionCount === 0} aria-label={`Prikaži kodo QR za zbirko ${collection.name}`} title={collection.questionCount === 0 ? 'Zbirka še nima vprašanj' : 'Koda QR'}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                    <rect x="4" y="4" width="6" height="6" rx="1" />
+                    <rect x="14" y="4" width="6" height="6" rx="1" />
+                    <rect x="4" y="14" width="6" height="6" rx="1" />
+                    <path d="M14 14h2v2h-2zM18 14h2M18 18h2v2M14 20h2" />
+                  </svg>
+                </button>
                 {!loadError && (
                   <Link className="button secondary-button icon-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.name}`} title="Uredi">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -155,6 +169,7 @@ export default function CollectionDashboardPage() {
           })}
         </ul>
       )}
+      {qrCollection && <ShareQrDialog name={qrCollection.name} url={playUrl(qrCollection)} onClose={() => setQrCollection(null)} />}
     </section>
   )
 }
