@@ -16,6 +16,7 @@ function isQuestion(value: unknown): value is Question {
   const possibleAnswers: string[] = value.possibleAnswers
   if (new Set(possibleAnswers.map(answer => answer.trim())).size !== possibleAnswers.length) return false
   if (typeof value.answer !== 'string') return false
+  if (value.hint !== undefined && value.hint !== null && typeof value.hint !== 'string') return false
   const answer = value.answer
   return possibleAnswers.some(possibleAnswer => possibleAnswer.trim() === answer.trim())
 }
@@ -25,6 +26,8 @@ function isCollection(value: unknown): value is Collection {
   if (typeof value.id !== 'string' || value.id.trim() === '') return false
   if (typeof value.name !== 'string' || value.name.trim() === '' || value.name.length > COLLECTION_LIMITS.name) return false
   if (typeof value.subject !== 'string' || value.subject.trim() === '') return false
+  if (typeof value.grade !== 'number' || !Number.isInteger(value.grade) || value.grade < 1 || value.grade > 9) return false
+  if (typeof value.gameId !== 'string' || value.gameId.trim() === '') return false
   if (typeof value.description !== 'string') return false
   return Array.isArray(value.questions) && value.questions.every(isQuestion)
 }
@@ -60,13 +63,15 @@ function writeCollections(collections: Collection[]): void {
   }
 }
 
-export function createCollection(details: CollectionMetadata): void {
+export function createCollection(details: CollectionMetadata & { grade: number; gameId: string }): void {
   const collections = readCollections()
   const collection: Collection = {
     id: crypto.randomUUID(),
     name: details.name.trim(),
     subject: details.subject.trim(),
+    grade: details.grade,
     description: '',
+    gameId: details.gameId,
     questions: [],
   }
   if (!isCollection(collection)) throw new Error('Podatki zbirke niso veljavni. Preveri ime in predmet.')

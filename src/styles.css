@@ -504,8 +504,9 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
 .answer-remove:hover { background: #ffe9e2; }
 .add-answer-button { margin-top: 14px; }
 .add-question-button { margin-top: 24px; }
-.collection-icon { display: grid; place-items: center; flex-shrink: 0; width: 64px; height: 64px; border-radius: 18px; background: #baeaff; color: #126397; font-size: 28px; font-weight: 800; }
-.collection-card:nth-child(even) .collection-icon { background: #ded5ff; color: #51448a; }
+.collection-icon { display: grid; place-items: center; flex-shrink: 0; width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, #baeaff, #8dd8e8); color: #0f5d83; font-size: 28px; font-weight: 800; box-shadow: inset 0 0 0 1px #ffffff80; }
+.collection-card:nth-child(even) .collection-icon { background: linear-gradient(135deg, #ded5ff, #c3b6ff); color: #4a3a8a; }
+.collection-icon-image { display: block; width: 36px; height: 36px; }
 
 @media (max-width: 900px) {
   .metadata-fields { grid-template-columns: 1fr 1fr; }

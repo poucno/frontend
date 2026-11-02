@@ -15,7 +15,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P1',
     name: 'Poštevanka',
     subject: 'matematika',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Koliko je 6 × 4?', possibleAnswers: ['24', '18', '30'], answer: '24' },
       { question: 'Koliko je 7 × 8?', possibleAnswers: ['48', '56', '64'], answer: '56' },
@@ -28,7 +30,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P2',
     name: 'Seštevanje in odštevanje',
     subject: 'matematika',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Koliko je 15 + 27?', possibleAnswers: ['32', '42', '52'], answer: '42' },
       { question: 'Koliko je 84 − 37?', possibleAnswers: ['47', '53', '41'], answer: '47' },
@@ -41,7 +45,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P3',
     name: 'Vesolje',
     subject: 'naravoslovje',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Kateri planet je najbližje Soncu?', possibleAnswers: ['Merkur', 'Venera', 'Zemlja'], answer: 'Merkur' },
       { question: 'Kateri planet je znan kot rdeči planet?', possibleAnswers: ['Mars', 'Jupiter', 'Neptun'], answer: 'Mars' },
@@ -54,7 +60,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P4',
     name: 'Živali',
     subject: 'naravoslovje',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Katera žival je največja na svetu?', possibleAnswers: ['Modri kit', 'Slon', 'Žirafa'], answer: 'Modri kit' },
       { question: 'Katera ptica ne leti in živi na Antarktiki?', possibleAnswers: ['Pingvin', 'Noj', 'Orel'], answer: 'Pingvin' },
@@ -67,7 +75,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P5',
     name: 'Geografija',
     subject: 'geografija',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Katero je glavno mesto Francije?', possibleAnswers: ['Pariz', 'Rim', 'Madrid'], answer: 'Pariz' },
       { question: 'Katera je najdaljša reka na svetu?', possibleAnswers: ['Nil', 'Amazonka', 'Donava'], answer: 'Nil' },
@@ -80,7 +90,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P6',
     name: 'Angleščina – besede',
     subject: 'angleščina',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Kako se v angleščini reče »hiša«?', possibleAnswers: ['house', 'horse', 'mouse'], answer: 'house' },
       { question: 'Kako se v angleščini reče »pes«?', possibleAnswers: ['dog', 'cat', 'bird'], answer: 'dog' },
@@ -93,7 +105,9 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
     id: 'P7',
     name: 'Slovenščina – besedne vrste',
     subject: 'slovenščina',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [
       { question: 'Katera beseda je samostalnik?', possibleAnswers: ['miza', 'teči', 'lep'], answer: 'miza' },
       { question: 'Katera beseda je glagol?', possibleAnswers: ['peti', 'hiša', 'rdeč'], answer: 'peti' },
@@ -107,4 +121,16 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
 export function findPublicCollection(id: string | undefined): Collection | undefined {
   if (!id || !id.startsWith('P')) return undefined
   return PUBLIC_COLLECTIONS.find(collection => collection.id === id)
+}
+
+function normalizeSubject(subject: string): string {
+  return subject.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+const SUBJECT_IMAGE_LOOKUP: Record<string, string> = Object.fromEntries(
+  Object.entries(SUBJECT_IMAGES).map(([subject, image]) => [normalizeSubject(subject), image]),
+)
+
+export function subjectImage(subject: string): string | undefined {
+  return SUBJECT_IMAGE_LOOKUP[normalizeSubject(subject)]
 }
