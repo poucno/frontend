@@ -1,6 +1,10 @@
 import type { Question } from '../types/collection'
+import { BalloonIcon } from './Decorations'
+import type { BalloonName } from './Decorations'
 import { COLLECTION_LIMITS } from '../data/collectionValidation'
 import type { QuestionErrors } from '../data/collectionValidation'
+
+const TONES: BalloonName[] = ['coral', 'yellow', 'blue']
 
 type QuestionEditorProps = {
   question: Question
@@ -46,22 +50,27 @@ export default function QuestionEditor({ question, index, errors, onChange, onRe
         <legend>Možni odgovori</legend>
         <p id={`${prefix}-answer-help`} className="answer-help">Označi pravilen odgovor.</p>
         {errors?.answerCount && <p className="field-error">{errors.answerCount}</p>}
-        {question.possibleAnswers.map((possibleAnswer, answerIndex) => (
-          <div className="answer-row" key={answerIndex}>
-            <label className="correct-answer-label">
-              <input type="radio" name={`${prefix}-correct`} value={possibleAnswer} checked={question.answer === possibleAnswer && possibleAnswer !== ''} onChange={() => onChange({ ...question, answer: possibleAnswer })} aria-invalid={!!errors?.answer} />
-              <span className="sr-only">Pravilen odgovor {answerIndex + 1} za vprašanje {index + 1}</span>
-            </label>
-            <div className="form-field">
-              <label className="sr-only" htmlFor={`${prefix}-answer-${answerIndex}`}>Odgovor {answerIndex + 1} za vprašanje {index + 1}</label>
-              <input id={`${prefix}-answer-${answerIndex}`} value={possibleAnswer} onChange={event => changeAnswer(answerIndex, event.target.value)} required maxLength={COLLECTION_LIMITS.answer} placeholder={`Odgovor ${answerIndex + 1}`} aria-invalid={!!errors?.possibleAnswers[answerIndex]} aria-describedby={errors?.possibleAnswers[answerIndex] ? `${prefix}-answer-${answerIndex}-error` : undefined} />
-              {errors?.possibleAnswers[answerIndex] && <p id={`${prefix}-answer-${answerIndex}-error`} className="field-error">{errors.possibleAnswers[answerIndex]}</p>}
+        {question.possibleAnswers.map((possibleAnswer, answerIndex) => {
+          const isCorrect = question.answer === possibleAnswer && possibleAnswer !== ''
+          const tone = TONES[answerIndex % TONES.length] ?? 'blue'
+          return (
+            <div className="answer-row" key={answerIndex} data-tone={tone}>
+              <label className="correct-answer-label">
+                <input type="radio" name={`${prefix}-correct`} value={possibleAnswer} checked={isCorrect} onChange={() => onChange({ ...question, answer: possibleAnswer })} aria-invalid={!!errors?.answer} />
+                <BalloonIcon className="balloon-radio" tone={tone} mood={isCorrect ? 'happy' : 'calm'} />
+                <span className="sr-only">Pravilen odgovor {answerIndex + 1} za vprašanje {index + 1}</span>
+              </label>
+              <div className="form-field">
+                <label className="sr-only" htmlFor={`${prefix}-answer-${answerIndex}`}>Odgovor {answerIndex + 1} za vprašanje {index + 1}</label>
+                <input id={`${prefix}-answer-${answerIndex}`} value={possibleAnswer} onChange={event => changeAnswer(answerIndex, event.target.value)} required maxLength={COLLECTION_LIMITS.answer} placeholder={`Odgovor ${answerIndex + 1}`} aria-invalid={!!errors?.possibleAnswers[answerIndex]} aria-describedby={errors?.possibleAnswers[answerIndex] ? `${prefix}-answer-${answerIndex}-error` : undefined} />
+                {errors?.possibleAnswers[answerIndex] && <p id={`${prefix}-answer-${answerIndex}-error`} className="field-error">{errors.possibleAnswers[answerIndex]}</p>}
+              </div>
+              {question.possibleAnswers.length > COLLECTION_LIMITS.minAnswers && (
+                <button className="answer-remove" type="button" onClick={() => removeAnswer(answerIndex)} aria-label={`Odstrani odgovor ${answerIndex + 1}`}>×</button>
+              )}
             </div>
-            {question.possibleAnswers.length > COLLECTION_LIMITS.minAnswers && (
-              <button className="answer-remove" type="button" onClick={() => removeAnswer(answerIndex)} aria-label={`Odstrani odgovor ${answerIndex + 1}`}>×</button>
-            )}
-          </div>
-        ))}
+          )
+        })}
         {question.possibleAnswers.length < COLLECTION_LIMITS.maxAnswers && (
           <button className="button secondary-button add-answer-button" type="button" onClick={addAnswer}><span aria-hidden="true">＋</span> Dodaj odgovor</button>
         )}
