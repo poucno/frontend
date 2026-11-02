@@ -87,8 +87,22 @@ export default function CollectionDashboardPage() {
                 {collection.questionCount === 0 && <span className="draft-label">Osnutek brez vprašanj</span>}
               </div>
               <div className="collection-actions">
-                {!loadError && <Link className="button secondary-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.name}`}>Uredi <span aria-hidden="true">↗</span></Link>}
-                <button className="button secondary-button delete-button" disabled={deletingId === collection.id} onClick={() => handleDelete(collection)} aria-label={`Izbriši zbirko ${collection.name}`}>{deletingId === collection.id ? 'Brišem …' : 'Izbriši'}</button>
+                {!loadError && (
+                  <Link className="button secondary-button icon-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.name}`} title="Uredi">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                      <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+                      <path d="M13.5 6.5l4 4" />
+                    </svg>
+                  </Link>
+                )}
+                <button className="button secondary-button icon-button delete-button" disabled={deletingId === collection.id} onClick={() => handleDelete(collection)} aria-label={`Izbriši zbirko ${collection.name}`} title="Izbriši">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M4 7h16" />
+                    <path d="M10 4h4" />
+                    <path d="M6 7l1 13h10l1-13" />
+                    <path d="M10 11v5M14 11v5" />
+                  </svg>
+                </button>
               </div>
             </li>
           ))}
