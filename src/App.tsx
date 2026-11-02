@@ -2,7 +2,6 @@ import { createBrowserRouter, createRoutesFromElements, Link, NavLink, Outlet, R
 import { useEffect, useRef } from 'react'
 import { Balloons, IslandMark, Landscape } from './components/Decorations'
 import MotionProvider from './components/MotionProvider'
-import MotionToggle from './components/MotionToggle'
 import UserMenu from './components/UserMenu'
 import { useMotion } from './hooks/useMotion'
 import { useAuth } from './hooks/useAuth'
@@ -44,7 +43,6 @@ function Layout() {
           <span>Otok znanja</span>
         </Link>
         <div className="header-actions">
-          <MotionToggle />
           <nav aria-label="Glavna navigacija">
             {session
               ? <UserMenu email={session.email} onLogout={() => { logout(); navigate('/') }} />
