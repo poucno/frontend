@@ -517,3 +517,20 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
   .games-list { grid-template-columns: 1fr; }
   .collection-icon { width: 48px; height: 48px; border-radius: 14px; font-size: 23px; }
 }
+
+/* ============ User menu ============ */
+.user-menu { position: relative; }
+.user-menu-button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 14px 6px 8px; border: 2px solid #ffffffb0; border-radius: 999px; background: #ffffff80; color: var(--navy); font-size: 15px; font-weight: 700; transition: background-color 150ms, transform 200ms var(--spring); }
+.user-menu-button:hover { background: var(--cream); transform: translateY(-2px); }
+.user-avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--teal); color: #fff; font-family: var(--font-display); font-size: 15px; font-weight: 800; }
+.user-name { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-menu-panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; display: flex; min-width: 220px; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--cream); box-shadow: 0 14px 40px #10245126; animation: pop-in 0.25s var(--spring); }
+.user-menu-email { padding: 4px 6px 8px; border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ink-soft); overflow-wrap: anywhere; }
+.user-menu-link { display: flex; align-items: center; min-height: 42px; padding: 8px 12px; border-radius: 10px; color: var(--navy); font-size: 15px; font-weight: 700; text-decoration: none; }
+.user-menu-link:hover { background: #eaf3f1; }
+.user-menu-logout { min-height: 42px; padding: 8px 12px; border: 0; border-radius: 10px; background: #fff1eb; color: var(--danger); font-size: 15px; font-weight: 700; text-align: left; }
+.user-menu-logout:hover { background: #ffe3d8; }
+
+@media (max-width: 640px) {
+  .user-name { display: none; }
+}

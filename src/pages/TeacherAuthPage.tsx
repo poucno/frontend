@@ -1,30 +1,33 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import PasswordField from '../components/PasswordField'
 import { Balloons, Birds } from '../components/Decorations'
 import { useMotion } from '../hooks/useMotion'
+import { login, register } from '../data/authApi'
 
 type AuthFields = { fullName: string; email: string; password: string; passwordConfirmation: string }
 type AuthErrors = { fullName?: string; email?: string; password?: string; passwordConfirmation?: string }
 
 export default function TeacherAuthPage({ mode }: { mode: 'login' | 'register' }) {
   const registering = mode === 'register'
+  const navigate = useNavigate()
   const [fields, setFields] = useState<AuthFields>({ fullName: '', email: '', password: '', passwordConfirmation: '' })
   const [errors, setErrors] = useState<AuthErrors>({})
-  const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const [shaking, setShaking] = useState(false)
   const { motionEnabled } = useMotion()
 
   function updateField(name: keyof AuthFields, value: string) {
     setFields(previous => ({ ...previous, [name]: value }))
     setErrors(previous => ({ ...previous, [name]: undefined }))
-    setSubmitted(false)
+    setSubmitError(null)
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setSubmitted(false)
+    setSubmitError(null)
     const nextErrors: AuthErrors = {}
     if (registering && !fields.fullName.trim()) nextErrors.fullName = 'Vnesite ime in priimek.'
     const emailInput = event.currentTarget.elements.namedItem('email')
@@ -43,8 +46,18 @@ export default function TeacherAuthPage({ mode }: { mode: 'login' | 'register' }
       if (field instanceof HTMLElement) field.focus()
       return
     }
-    // UI preview only: there is no authentication request or local account.
-    setSubmitted(true)
+
+    setLoading(true)
+    try {
+      const email = fields.email.trim()
+      if (registering) await register(email, fields.password)
+      await login(email, fields.password)
+      navigate('/teachers')
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Prišlo je do napake. Poskusi znova.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -76,17 +89,15 @@ export default function TeacherAuthPage({ mode }: { mode: 'login' | 'register' }
           <PasswordField name="password" label="Geslo" value={fields.password} onChange={value => updateField('password', value)} autoComplete={registering ? 'new-password' : 'current-password'} error={errors.password} />
           {registering && <PasswordField name="passwordConfirmation" label="Ponovite geslo" value={fields.passwordConfirmation} onChange={value => updateField('passwordConfirmation', value)} autoComplete="new-password" error={errors.passwordConfirmation} />}
           {Object.values(errors).some(Boolean) && <p className="field-error" role="alert">Preverite označena polja.</p>}
-          <button className="button auth-submit" type="submit">{registering ? 'Ustvari račun' : 'Prijava'} <span aria-hidden="true">›</span></button>
-          {submitted && <p className="auth-notice" role="status">{registering ? 'Registracija' : 'Prijava'} še ni na voljo. Podatki niso bili poslani.</p>}
+          {submitError && <p className="error-message" role="alert">{submitError}</p>}
+          <button className="button auth-submit" type="submit" disabled={loading}>
+            {loading ? 'Prosimo, počakajte …' : registering ? 'Ustvari račun' : 'Prijava'} <span aria-hidden="true">›</span>
+          </button>
         </form>
         <p className="auth-switch">
           {registering ? 'Že imate račun?' : 'Še nimate računa?'}{' '}
           <Link to={registering ? '/teachers/login' : '/teachers/register'}>{registering ? 'Prijavite se' : 'Ustvarite račun'}</Link>
         </p>
-      </div>
-      <div className="auth-preview-note">
-        <p>Prijava in registracija bosta na voljo kmalu.</p>
-        <Link to="/teachers">Odpri lokalni predogled zbirk</Link>
       </div>
     </section>
   )
