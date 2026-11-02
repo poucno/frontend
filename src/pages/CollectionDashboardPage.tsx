@@ -127,7 +127,7 @@ export default function CollectionDashboardPage() {
                 {collection.questionCount === 0 && <span className="draft-label">Osnutek brez vprašanj</span>}
               </div>
               <div className="collection-actions">
-                <button className={`button secondary-button icon-button copy-button${copiedId === collection.id ? ' is-copied' : ''}`} type="button" onClick={() => handleCopy(collection)} aria-label={`Kopiraj povezavo do zbirke ${collection.name}`} title={copiedId === collection.id ? 'Kopirano' : 'Kopiraj povezavo'}>
+                <button className={`button secondary-button icon-button copy-button${copiedId === collection.id ? ' is-copied' : ''}`} type="button" onClick={() => handleCopy(collection)} disabled={collection.questionCount === 0} aria-label={`Kopiraj povezavo do zbirke ${collection.name}`} title={collection.questionCount === 0 ? 'Zbirka še nima vprašanj' : copiedId === collection.id ? 'Kopirano' : 'Kopiraj povezavo'}>
                   {copiedId === collection.id
                     ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4L19 7" /></svg>
                     : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4" /><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L13 19" /></svg>}
