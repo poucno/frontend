@@ -44,7 +44,7 @@ export default function QuestionSetsPage() {
               <span className="set-icon" aria-hidden="true">{collection.questions.length}</span>
               <span className="set-details">
                 <span className="set-name">{collection.name}</span>
-                <span className="set-meta">{collection.subject} · {collection.questions.length} vprašanj</span>
+                <span className="set-meta">{capitalize(collection.subject)} · {collection.questions.length} vprašanj</span>
               </span>
               <span className="set-arrow" aria-hidden="true">→</span>
             </Link>
