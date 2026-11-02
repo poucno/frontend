@@ -1,40 +1,32 @@
-import type { Answer, Collection, Question } from '../types/collection'
-import { hasValidationErrors, trimCollection, validateQuestionSet } from './collectionValidation'
+import type { Collection, CollectionMetadata, Question } from '../types/collection'
+import { COLLECTION_LIMITS, hasValidationErrors, trimCollection, validateCollection } from './collectionValidation'
 
-export const COLLECTIONS_STORAGE_KEY = 'otok-znanja.collections.v1'
+export const COLLECTIONS_STORAGE_KEY = 'otok-znanja.collections.v2'
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function isAnswer(value: unknown): value is Answer {
-  return isObject(value) && typeof value.id === 'string' && value.id.trim() !== '' && typeof value.text === 'string'
-}
-
 function isQuestion(value: unknown): value is Question {
-  return isObject(value)
-    && typeof value.id === 'string' && value.id.trim() !== ''
-    && typeof value.text === 'string'
-    && Array.isArray(value.answers) && value.answers.length >= 3 && value.answers.length <= 5 && value.answers.every(isAnswer)
-    && new Set(value.answers.map(answer => answer.id)).size === value.answers.length
-    && typeof value.correctAnswerId === 'string'
-    && value.answers.some(answer => answer.id === value.correctAnswerId)
-    && (value.hint === undefined || typeof value.hint === 'string')
+  if (!isObject(value)) return false
+  if (typeof value.question !== 'string') return false
+  if (!Array.isArray(value.possibleAnswers)) return false
+  if (value.possibleAnswers.length < COLLECTION_LIMITS.minAnswers || value.possibleAnswers.length > COLLECTION_LIMITS.maxAnswers) return false
+  if (!value.possibleAnswers.every(answer => typeof answer === 'string')) return false
+  const possibleAnswers: string[] = value.possibleAnswers
+  if (new Set(possibleAnswers.map(answer => answer.trim())).size !== possibleAnswers.length) return false
+  if (typeof value.answer !== 'string') return false
+  const answer = value.answer
+  return possibleAnswers.some(possibleAnswer => possibleAnswer.trim() === answer.trim())
 }
 
-// Check stored data before using it; empty question arrays are local drafts.
 function isCollection(value: unknown): value is Collection {
-  return isObject(value)
-    && typeof value.id === 'string' && value.id.trim() !== ''
-    && value.version === 1
-    && typeof value.title === 'string' && value.title.trim() !== '' && value.title.length <= 80
-    && typeof value.subject === 'string' && value.subject.trim() !== ''
-    && typeof value.grade === 'number' && Number.isInteger(value.grade) && value.grade >= 1 && value.grade <= 9
-    && isObject(value.settings)
-    && typeof value.settings.shuffleQuestions === 'boolean'
-    && typeof value.settings.movingBalloons === 'boolean'
-    && Array.isArray(value.questions) && value.questions.every(isQuestion)
-    && new Set(value.questions.map(question => question.id)).size === value.questions.length
+  if (!isObject(value)) return false
+  if (typeof value.id !== 'string' || value.id.trim() === '') return false
+  if (typeof value.name !== 'string' || value.name.trim() === '' || value.name.length > COLLECTION_LIMITS.name) return false
+  if (typeof value.subject !== 'string' || value.subject.trim() === '') return false
+  if (typeof value.description !== 'string') return false
+  return Array.isArray(value.questions) && value.questions.every(isQuestion)
 }
 
 export function readCollections(): Collection[] {
@@ -68,19 +60,16 @@ function writeCollections(collections: Collection[]): void {
   }
 }
 
-export function createCollection(details: { title: string; subject: string; grade: number }): void {
-  // Re-read before each change so damaged or newer data is never overwritten.
+export function createCollection(details: CollectionMetadata): void {
   const collections = readCollections()
   const collection: Collection = {
     id: crypto.randomUUID(),
-    version: 1,
-    title: details.title.trim(),
+    name: details.name.trim(),
     subject: details.subject.trim(),
-    grade: details.grade,
-    settings: { shuffleQuestions: true, movingBalloons: true },
+    description: '',
     questions: [],
   }
-  if (!isCollection(collection)) throw new Error('Podatki zbirke niso veljavni. Preveri naslov, predmet in razred.')
+  if (!isCollection(collection)) throw new Error('Podatki zbirke niso veljavni. Preveri ime in predmet.')
   writeCollections([...collections, collection])
 }
 
@@ -98,6 +87,6 @@ export function updateCollection(collection: Collection, original: Collection): 
   if (JSON.stringify(current) !== JSON.stringify(original)) {
     throw new Error('Zbirka je bila med urejanjem spremenjena v drugem zavihku. Novejši podatki niso prepisani; tvoji vnosi ostajajo v obrazcu.')
   }
-  if (hasValidationErrors(validateQuestionSet(collection))) throw new Error('Zbirka vsebuje napake. Preveri označena polja.')
+  if (hasValidationErrors(validateCollection(collection))) throw new Error('Zbirka vsebuje napake. Preveri označena polja.')
   writeCollections(collections.map(item => item.id === collection.id ? trimCollection(collection) : item))
 }

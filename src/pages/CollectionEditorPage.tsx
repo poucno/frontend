@@ -3,8 +3,8 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges'
 import { readCollections, updateCollection } from '../data/collectionsStorage'
-import { hasValidationErrors, validateQuestionSet } from '../data/collectionValidation'
-import type { QuestionSetErrors } from '../data/collectionValidation'
+import { hasValidationErrors, validateCollection } from '../data/collectionValidation'
+import type { CollectionErrors } from '../data/collectionValidation'
 import type { Collection, Question } from '../types/collection'
 import CollectionMetadataFields from '../components/CollectionMetadataFields'
 import QuestionEditor from '../components/QuestionEditor'
@@ -34,7 +34,7 @@ function EditorLoader({ collectionId }: { collectionId: string }) {
 function CollectionEditor({ initialCollection }: { initialCollection: Collection }) {
   const navigate = useNavigate()
   const [draft, setDraft] = useState(() => structuredClone(initialCollection))
-  const [errors, setErrors] = useState<QuestionSetErrors | null>(null)
+  const [errors, setErrors] = useState<CollectionErrors | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const hasChanges = JSON.stringify(draft) !== JSON.stringify(initialCollection)
@@ -42,35 +42,36 @@ function CollectionEditor({ initialCollection }: { initialCollection: Collection
 
   function changeDraft(next: Collection) {
     setDraft(next)
-    if (errors) setErrors(validateQuestionSet(next))
+    if (errors) setErrors(validateCollection(next))
     setSaveError(null)
   }
 
   function addQuestion() {
     const question: Question = {
-      id: crypto.randomUUID(),
-      text: '',
-      answers: [{ id: 'a', text: '' }, { id: 'b', text: '' }, { id: 'c', text: '' }],
-      correctAnswerId: '',
+      question: '',
+      possibleAnswers: ['', '', ''],
+      answer: '',
     }
-    changeDraft({ ...draft, questions: [...draft.questions, question] })
-    requestAnimationFrame(() => document.getElementById(`question-${question.id}-text`)?.focus())
+    const questions = [...draft.questions, question]
+    changeDraft({ ...draft, questions })
+    requestAnimationFrame(() => document.getElementById(`question-${questions.length - 1}-text`)?.focus())
   }
 
-  function removeQuestion(id: string) {
-    const index = draft.questions.findIndex(question => question.id === id)
-    const questions = draft.questions.filter(question => question.id !== id)
+  function removeQuestion(index: number) {
+    const questions = draft.questions.filter((_, i) => i !== index)
     changeDraft({ ...draft, questions })
-    const nextQuestion = questions[Math.min(index, questions.length - 1)]
     requestAnimationFrame(() => {
-      const target = nextQuestion ? document.getElementById(`question-${nextQuestion.id}-text`) : formRef.current?.querySelector<HTMLElement>('.add-question-button')
+      const nextIndex = Math.min(index, questions.length - 1)
+      const target = nextIndex >= 0
+        ? document.getElementById(`question-${nextIndex}-text`)
+        : formRef.current?.querySelector<HTMLElement>('.add-question-button')
       target?.focus()
     })
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const nextErrors = validateQuestionSet(draft)
+    const nextErrors = validateCollection(draft)
     setErrors(nextErrors)
     setSaveError(null)
     if (hasValidationErrors(nextErrors)) {
@@ -93,17 +94,11 @@ function CollectionEditor({ initialCollection }: { initialCollection: Collection
       <p className="local-mode">Lokalni način · Zbirke so shranjene samo v tem brskalniku.</p>
       <form ref={formRef} className="editor-form" onSubmit={handleSubmit} noValidate>
         <CollectionMetadataFields metadata={draft} errors={errors ?? {}} onChange={metadata => changeDraft({ ...draft, ...metadata })} />
-        <fieldset className="collection-settings">
-          <legend>Nastavitve igre</legend>
-          <label><input type="checkbox" checked={draft.settings.shuffleQuestions} onChange={event => changeDraft({ ...draft, settings: { ...draft.settings, shuffleQuestions: event.target.checked } })} /> Naključen vrstni red vprašanj</label>
-          <label><input type="checkbox" checked={draft.settings.movingBalloons} onChange={event => changeDraft({ ...draft, settings: { ...draft.settings, movingBalloons: event.target.checked } })} /> Premikanje balonov</label>
-          {errors?.settings && <p className="field-error">{errors.settings}</p>}
-        </fieldset>
         <div className="question-list">
           {draft.questions.map((question, index) => (
-            <QuestionEditor key={question.id} question={question} index={index} errors={errors?.questionErrors[index]}
-              onChange={updated => changeDraft({ ...draft, questions: draft.questions.map(item => item.id === updated.id ? updated : item) })}
-              onRemove={() => removeQuestion(question.id)} />
+            <QuestionEditor key={index} question={question} index={index} errors={errors?.questionErrors[index]}
+              onChange={updated => changeDraft({ ...draft, questions: draft.questions.map((item, i) => i === index ? updated : item) })}
+              onRemove={() => removeQuestion(index)} />
           ))}
         </div>
         {draft.questions.length === 0 && <p className="form-note">Zbirka še nima vprašanj.</p>}

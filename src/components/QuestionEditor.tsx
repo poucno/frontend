@@ -10,76 +10,63 @@ type QuestionEditorProps = {
   onRemove: () => void
 }
 
-const ANSWER_ID_CANDIDATES = ['a', 'b', 'c', 'd', 'e']
-
 export default function QuestionEditor({ question, index, errors, onChange, onRemove }: QuestionEditorProps) {
-  const prefix = `question-${question.id}`
+  const prefix = `question-${index}`
 
   function changeAnswer(answerIndex: number, text: string) {
-    const answer = question.answers[answerIndex]
-    if (!answer) return
-    const answers: Question['answers'] = [...question.answers]
-    answers[answerIndex] = { ...answer, text }
-    onChange({ ...question, answers })
+    const previous = question.possibleAnswers[answerIndex] ?? ''
+    const possibleAnswers = question.possibleAnswers.map((answer, i) => i === answerIndex ? text : answer)
+    const answer = question.answer === previous ? text : question.answer
+    onChange({ ...question, possibleAnswers, answer })
   }
 
   function addAnswer() {
-    if (question.answers.length >= COLLECTION_LIMITS.maxAnswers) return
-    const used = new Set(question.answers.map(answer => answer.id))
-    const id = ANSWER_ID_CANDIDATES.find(candidate => !used.has(candidate))
-    if (!id) return
-    onChange({ ...question, answers: [...question.answers, { id, text: '' }] })
+    if (question.possibleAnswers.length >= COLLECTION_LIMITS.maxAnswers) return
+    onChange({ ...question, possibleAnswers: [...question.possibleAnswers, ''] })
   }
 
-  function removeAnswer(id: string) {
-    if (question.answers.length <= COLLECTION_LIMITS.minAnswers) return
-    onChange({
-      ...question,
-      answers: question.answers.filter(answer => answer.id !== id),
-      correctAnswerId: question.correctAnswerId === id ? '' : question.correctAnswerId,
-    })
+  function removeAnswer(answerIndex: number) {
+    if (question.possibleAnswers.length <= COLLECTION_LIMITS.minAnswers) return
+    const removed = question.possibleAnswers[answerIndex]
+    const possibleAnswers = question.possibleAnswers.filter((_, i) => i !== answerIndex)
+    const answer = question.answer === removed ? '' : question.answer
+    onChange({ ...question, possibleAnswers, answer })
   }
 
   return (
     <fieldset className="question-card">
       <legend>Vprašanje {index + 1}</legend>
       <button className="question-remove" type="button" onClick={onRemove} aria-label={`Odstrani vprašanje ${index + 1}`}>Odstrani</button>
-      {errors?.id && <p className="field-error">{errors.id}</p>}
       <div className="form-field question-text-field">
         <label htmlFor={`${prefix}-text`}>Vprašanje</label>
-        <textarea id={`${prefix}-text`} rows={2} value={question.text} onChange={event => onChange({ ...question, text: event.target.value })} required maxLength={COLLECTION_LIMITS.question} placeholder="Koliko je 6 × 4?" aria-invalid={!!errors?.text} aria-describedby={errors?.text ? `${prefix}-text-error` : undefined} />
-        {errors?.text && <p id={`${prefix}-text-error`} className="field-error">{errors.text}</p>}
+        <textarea id={`${prefix}-text`} rows={2} value={question.question} onChange={event => onChange({ ...question, question: event.target.value })} required maxLength={COLLECTION_LIMITS.question} placeholder="Koliko je 6 × 4?" aria-invalid={!!errors?.question} aria-describedby={errors?.question ? `${prefix}-text-error` : undefined} />
+        {errors?.question && <p id={`${prefix}-text-error`} className="field-error">{errors.question}</p>}
       </div>
-      <fieldset className="answer-fields" aria-describedby={`${prefix}-answer-help${errors?.correctAnswerId ? ` ${prefix}-correct-error` : ''}`}>
+      <fieldset className="answer-fields" aria-describedby={`${prefix}-answer-help${errors?.answer ? ` ${prefix}-answer-error` : ''}`}>
         <legend>Možni odgovori</legend>
         <p id={`${prefix}-answer-help`} className="answer-help">Označi pravilen odgovor.</p>
         {errors?.answerCount && <p className="field-error">{errors.answerCount}</p>}
-        {question.answers.map((answer, answerIndex) => (
-          <div className="answer-row" key={answer.id}>
+        {question.possibleAnswers.map((possibleAnswer, answerIndex) => (
+          <div className="answer-row" key={answerIndex}>
             <label className="correct-answer-label">
-              <input type="radio" name={`${prefix}-correct`} value={answer.id} checked={question.correctAnswerId === answer.id} onChange={() => onChange({ ...question, correctAnswerId: answer.id })} aria-invalid={!!errors?.correctAnswerId} />
+              <input type="radio" name={`${prefix}-correct`} value={possibleAnswer} checked={question.answer === possibleAnswer && possibleAnswer !== ''} onChange={() => onChange({ ...question, answer: possibleAnswer })} aria-invalid={!!errors?.answer} />
               <span className="sr-only">Pravilen odgovor {answerIndex + 1} za vprašanje {index + 1}</span>
             </label>
             <div className="form-field">
-              <label className="sr-only" htmlFor={`${prefix}-answer-${answer.id}`}>Odgovor {answerIndex + 1} za vprašanje {index + 1}</label>
-              <input id={`${prefix}-answer-${answer.id}`} value={answer.text} onChange={event => changeAnswer(answerIndex, event.target.value)} required maxLength={COLLECTION_LIMITS.answer} placeholder={`Odgovor ${answerIndex + 1}`} aria-invalid={!!errors?.answers[answerIndex]} aria-describedby={errors?.answers[answerIndex] ? `${prefix}-answer-${answer.id}-error` : undefined} />
-              {errors?.answers[answerIndex] && <p id={`${prefix}-answer-${answer.id}-error`} className="field-error">{errors.answers[answerIndex]}</p>}
+              <label className="sr-only" htmlFor={`${prefix}-answer-${answerIndex}`}>Odgovor {answerIndex + 1} za vprašanje {index + 1}</label>
+              <input id={`${prefix}-answer-${answerIndex}`} value={possibleAnswer} onChange={event => changeAnswer(answerIndex, event.target.value)} required maxLength={COLLECTION_LIMITS.answer} placeholder={`Odgovor ${answerIndex + 1}`} aria-invalid={!!errors?.possibleAnswers[answerIndex]} aria-describedby={errors?.possibleAnswers[answerIndex] ? `${prefix}-answer-${answerIndex}-error` : undefined} />
+              {errors?.possibleAnswers[answerIndex] && <p id={`${prefix}-answer-${answerIndex}-error`} className="field-error">{errors.possibleAnswers[answerIndex]}</p>}
             </div>
-            {question.answers.length > COLLECTION_LIMITS.minAnswers && (
-              <button className="answer-remove" type="button" onClick={() => removeAnswer(answer.id)} aria-label={`Odstrani odgovor ${answerIndex + 1}`}>×</button>
+            {question.possibleAnswers.length > COLLECTION_LIMITS.minAnswers && (
+              <button className="answer-remove" type="button" onClick={() => removeAnswer(answerIndex)} aria-label={`Odstrani odgovor ${answerIndex + 1}`}>×</button>
             )}
           </div>
         ))}
-        {question.answers.length < COLLECTION_LIMITS.maxAnswers && (
+        {question.possibleAnswers.length < COLLECTION_LIMITS.maxAnswers && (
           <button className="button secondary-button add-answer-button" type="button" onClick={addAnswer}><span aria-hidden="true">＋</span> Dodaj odgovor</button>
         )}
-        {errors?.correctAnswerId && <p id={`${prefix}-correct-error`} className="field-error">{errors.correctAnswerId}</p>}
+        {errors?.answer && <p id={`${prefix}-answer-error`} className="field-error">{errors.answer}</p>}
       </fieldset>
-      <div className="form-field">
-        <label htmlFor={`${prefix}-hint`}>Namig <span className="optional-label">(neobvezno)</span></label>
-        <input id={`${prefix}-hint`} value={question.hint ?? ''} onChange={event => onChange({ ...question, hint: event.target.value || undefined })} maxLength={COLLECTION_LIMITS.hint} placeholder="Pomagaj si: 6 + 6 + 6 + 6." aria-invalid={!!errors?.hint} aria-describedby={errors?.hint ? `${prefix}-hint-error` : undefined} />
-        {errors?.hint && <p id={`${prefix}-hint-error`} className="field-error">{errors.hint}</p>}
-      </div>
     </fieldset>
   )
 }

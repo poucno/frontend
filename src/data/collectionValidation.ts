@@ -1,82 +1,76 @@
-import type { Collection, CollectionMetadata, QuestionSet } from '../types/collection'
+import type { Collection, CollectionMetadata, Question } from '../types/collection'
 
-export const COLLECTION_LIMITS = { title: 80, question: 200, answer: 40, hint: 200, minAnswers: 3, maxAnswers: 5 }
+export const COLLECTION_LIMITS = { name: 80, question: 200, answer: 40, minAnswers: 3, maxAnswers: 5 }
 
-export type MetadataErrors = { title?: string; subject?: string; grade?: string }
+export type MetadataErrors = { name?: string; subject?: string }
 export type QuestionErrors = {
-  id?: string
-  text?: string
-  answers: string[]
+  question?: string
+  possibleAnswers: string[]
   answerCount?: string
-  correctAnswerId?: string
-  hint?: string
+  answer?: string
 }
-export type QuestionSetErrors = MetadataErrors & {
-  settings?: string
+export type CollectionErrors = MetadataErrors & {
   questions?: string
   questionErrors: QuestionErrors[]
 }
 
 export function validateMetadata(metadata: CollectionMetadata): MetadataErrors {
   const errors: MetadataErrors = {}
-  if (!metadata.title.trim()) errors.title = 'Vnesi naslov zbirke.'
-  else if (metadata.title.trim().length > COLLECTION_LIMITS.title) errors.title = 'Naslov je lahko dolg največ 80 znakov.'
+  if (!metadata.name.trim()) errors.name = 'Vnesi ime zbirke.'
+  else if (metadata.name.trim().length > COLLECTION_LIMITS.name) errors.name = 'Ime je lahko dolgo največ 80 znakov.'
   if (!metadata.subject.trim()) errors.subject = 'Vnesi predmet.'
-  if (!Number.isInteger(metadata.grade) || metadata.grade < 1 || metadata.grade > 9) errors.grade = 'Izberi razred od 1 do 9.'
   return errors
 }
 
-export function validateQuestionSet(collection: QuestionSet): QuestionSetErrors {
-  const errors: QuestionSetErrors = { ...validateMetadata(collection), questionErrors: [] }
-  if (typeof collection.settings.shuffleQuestions !== 'boolean' || typeof collection.settings.movingBalloons !== 'boolean') {
-    errors.settings = 'Nastavitvi morata biti vključeni ali izključeni.'
-  }
+export function validateCollection(collection: Collection): CollectionErrors {
+  const errors: CollectionErrors = { ...validateMetadata(collection), questionErrors: [] }
   if (collection.questions.length === 0) errors.questions = 'Dodaj najmanj eno vprašanje.'
 
-  errors.questionErrors = collection.questions.map(question => {
-    const questionErrors: QuestionErrors = { answers: [] }
-    if (!question.id.trim() || collection.questions.filter(item => item.id === question.id).length > 1) {
-      questionErrors.id = 'Vprašanje mora imeti svoj neprazen identifikator.'
-    }
-    if (!question.text.trim()) questionErrors.text = 'Vnesi vprašanje.'
-    else if (question.text.trim().length > COLLECTION_LIMITS.question) questionErrors.text = 'Vprašanje je lahko dolgo največ 200 znakov.'
-    if (question.answers.length < COLLECTION_LIMITS.minAnswers || question.answers.length > COLLECTION_LIMITS.maxAnswers) {
-      questionErrors.answerCount = 'Vprašanje mora imeti od 3 do 5 odgovorov.'
-    }
-    const answerTexts = question.answers.map(answer => answer.text.trim())
-    questionErrors.answers = question.answers.map(answer => {
-      if (!answer.id.trim() || question.answers.filter(item => item.id === answer.id).length > 1) return 'Odgovor mora imeti svoj neprazen identifikator.'
-      if (!answer.text.trim()) return 'Vnesi odgovor.'
-      if (answer.text.trim().length > COLLECTION_LIMITS.answer) return 'Odgovor je lahko dolg največ 40 znakov.'
-      if (answerTexts.filter(text => text === answer.text.trim()).length > 1) return 'Odgovori morajo biti različni.'
-      return ''
-    })
-    if (!question.answers.some(answer => answer.id === question.correctAnswerId)) {
-      questionErrors.correctAnswerId = 'Izberi en pravilen odgovor.'
-    }
-    if ((question.hint?.trim().length ?? 0) > COLLECTION_LIMITS.hint) questionErrors.hint = 'Namig je lahko dolg največ 200 znakov.'
-    return questionErrors
-  })
+  errors.questionErrors = collection.questions.map(question => validateQuestion(question))
   return errors
 }
 
-export function hasValidationErrors(errors: QuestionSetErrors): boolean {
-  return !!(errors.title || errors.subject || errors.grade || errors.settings || errors.questions
-    || errors.questionErrors.some(question => question.id || question.text || question.answerCount
-      || question.correctAnswerId || question.hint || question.answers.some(error => error !== '')))
+function validateQuestion(question: Question): QuestionErrors {
+  const errors: QuestionErrors = { possibleAnswers: [] }
+
+  if (!question.question.trim()) errors.question = 'Vnesi vprašanje.'
+  else if (question.question.trim().length > COLLECTION_LIMITS.question) errors.question = 'Vprašanje je lahko dolgo največ 200 znakov.'
+
+  if (question.possibleAnswers.length < COLLECTION_LIMITS.minAnswers || question.possibleAnswers.length > COLLECTION_LIMITS.maxAnswers) {
+    errors.answerCount = 'Vprašanje mora imeti od 3 do 5 odgovorov.'
+  }
+
+  const answers = question.possibleAnswers.map(answer => answer.trim())
+  errors.possibleAnswers = answers.map(answer => {
+    if (!answer) return 'Vnesi odgovor.'
+    if (answer.length > COLLECTION_LIMITS.answer) return 'Odgovor je lahko dolg največ 40 znakov.'
+    if (answers.filter(other => other === answer).length > 1) return 'Odgovori morajo biti različni.'
+    return ''
+  })
+
+  if (!question.answer.trim() || !answers.includes(question.answer.trim())) {
+    errors.answer = 'Izberi pravilen odgovor.'
+  }
+
+  return errors
+}
+
+export function hasValidationErrors(errors: CollectionErrors): boolean {
+  return !!(errors.name || errors.subject || errors.questions
+    || errors.questionErrors.some(question => question.question || question.answerCount || question.answer
+      || question.possibleAnswers.some(error => error !== '')))
 }
 
 export function trimCollection(collection: Collection): Collection {
   return {
     ...collection,
-    title: collection.title.trim(),
+    name: collection.name.trim(),
     subject: collection.subject.trim(),
+    description: collection.description.trim(),
     questions: collection.questions.map(question => ({
-      ...question,
-      text: question.text.trim(),
-      // Mapping preserves the existing three positions and stable answer IDs.
-      answers: question.answers.map(answer => ({ ...answer, text: answer.text.trim() })) as typeof question.answers,
-      hint: question.hint?.trim() || undefined,
+      question: question.question.trim(),
+      possibleAnswers: question.possibleAnswers.map(answer => answer.trim()),
+      answer: question.answer.trim(),
     })),
   }
 }

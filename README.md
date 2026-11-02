@@ -41,31 +41,21 @@ uporabljajo Vitest 4.1.11.
 
 ```json
 {
-  "version": 1,
-  "title": "Poštevanka števila 6",
+  "id": "…",
+  "name": "Poštevanka števila 6",
   "subject": "matematika",
-  "grade": 3,
-  "settings": {
-    "shuffleQuestions": true,
-    "movingBalloons": true
-  },
+  "description": "",
   "questions": [
     {
-      "id": "q1",
-      "text": "Koliko je 6 × 4?",
-      "answers": [
-        { "id": "a", "text": "18" },
-        { "id": "b", "text": "24" },
-        { "id": "c", "text": "30" }
-      ],
-      "correctAnswerId": "b",
-      "hint": "Pomagaj si: 6 + 6 + 6 + 6."
+      "question": "Koliko je 6 × 4?",
+      "possibleAnswers": ["18", "24", "30"],
+      "answer": "24"
     }
   ]
 }
 ```
 
-Razred je 1–9; vprašanje ima tri različne odgovore in en pravilen ID.
-ID-ji ostajajo stabilni; lokalni ID zbirke se ne izvaža. Izvoz zahteva najmanj
-eno vprašanje. Omejitve zaradi prostora: naslov 80, vprašanje 200, odgovor 40
-in namig 200 znakov. Nova lokalna zbirka je lahko prazen osnutek.
+Vsako vprašanje ima od 3 do 5 različnih odgovorov; `answer` mora biti eden od
+`possibleAnswers`. Izvoz zahteva najmanj eno vprašanje. Omejitve zaradi prostora:
+ime 80, vprašanje 200 in odgovor 40 znakov. Nova lokalna zbirka je lahko prazen
+osnutek.

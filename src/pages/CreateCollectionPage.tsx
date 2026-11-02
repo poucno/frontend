@@ -11,10 +11,10 @@ import UnsavedChangesDialog from '../components/UnsavedChangesDialog'
 
 export default function CreateCollectionPage() {
   const navigate = useNavigate()
-  const [metadata, setMetadata] = useState<CollectionMetadata>({ title: '', subject: '', grade: 3 })
+  const [metadata, setMetadata] = useState<CollectionMetadata>({ name: '', subject: '' })
   const [errors, setErrors] = useState<MetadataErrors>({})
   const [saveError, setSaveError] = useState<string | null>(null)
-  const hasChanges = metadata.title !== '' || metadata.subject !== '' || metadata.grade !== 3
+  const hasChanges = metadata.name !== '' || metadata.subject !== ''
   const { blocker, allowNavigation } = useUnsavedChanges(hasChanges)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -23,7 +23,7 @@ export default function CreateCollectionPage() {
     setErrors(nextErrors)
     setSaveError(null)
     if (Object.keys(nextErrors).length > 0) {
-      const field = nextErrors.title ? '#collection-title' : nextErrors.subject ? '#collection-subject' : '#collection-grade'
+      const field = nextErrors.name ? '#collection-name' : '#collection-subject'
       event.currentTarget.querySelector<HTMLElement>(field)?.focus()
       return
     }

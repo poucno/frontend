@@ -36,7 +36,7 @@ export default function CollectionDashboardPage() {
   }
 
   function handleDelete(collection: Collection) {
-    if (!window.confirm(`Izbrišem zbirko »${collection.title}«? Izbrisane zbirke ni mogoče obnoviti.`)) return
+    if (!window.confirm(`Izbrišem zbirko »${collection.name}«? Izbrisane zbirke ni mogoče obnoviti.`)) return
     try {
       const remaining = deleteCollection(collection.id)
       setDashboard({ collections: remaining, loadError: null })
@@ -60,7 +60,7 @@ export default function CollectionDashboardPage() {
         <div className="empty-state">
           <span className="collection-icon" aria-hidden="true">＋</span>
           <h2>Pripravi prvo zbirko</h2>
-          <p>Izberi naslov, predmet in razred.</p>
+          <p>Izberi ime in predmet.</p>
           <Link className="button" to="/teachers/collections/new">Ustvari zbirko <span aria-hidden="true">→</span></Link>
         </div>
       )}
@@ -68,15 +68,15 @@ export default function CollectionDashboardPage() {
         <ul className="collection-list">
           {collections.map(collection => (
             <li key={collection.id} className="collection-card">
-              <span className="collection-icon" aria-hidden="true">{collection.grade}</span>
+              <span className="collection-icon" aria-hidden="true">{collection.questions.length}</span>
               <div className="collection-details">
-                <h2>{collection.title}</h2>
-                <p>{collection.subject} · {collection.grade}. razred · Število vprašanj: {collection.questions.length}</p>
+                <h2>{collection.name}</h2>
+                <p>{collection.subject} · Število vprašanj: {collection.questions.length}</p>
                 {collection.questions.length === 0 && <span className="draft-label">Osnutek brez vprašanj</span>}
               </div>
               <div className="collection-actions">
-                {!loadError && <Link className="button secondary-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.title}`}>Uredi <span aria-hidden="true">↗</span></Link>}
-                <button className="button secondary-button delete-button" disabled={!!loadError} onClick={() => handleDelete(collection)} aria-label={`Izbriši zbirko ${collection.title}`}>Izbriši</button>
+                {!loadError && <Link className="button secondary-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.name}`}>Uredi <span aria-hidden="true">↗</span></Link>}
+                <button className="button secondary-button delete-button" disabled={!!loadError} onClick={() => handleDelete(collection)} aria-label={`Izbriši zbirko ${collection.name}`}>Izbriši</button>
               </div>
             </li>
           ))}

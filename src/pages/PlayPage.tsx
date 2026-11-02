@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { findGame } from '../data/games'
 import { DEFAULT_COLLECTION } from '../data/defaultCollection'
-import { toGameQuestions } from '../data/gameBridge'
 import type { GameQuestion, GameResult, GameToParent } from '../data/gameBridge'
 import type { Collection } from '../types/collection'
 
@@ -23,7 +22,7 @@ export default function PlayPage() {
     }
 
     if (collection) {
-      questions = toGameQuestions(collection)
+      questions = collection.questions
     } else {
       error = 'Zbirke ni mogoče najti.'
     }
