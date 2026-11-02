@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { IslandMark, Landscape } from './components/Decorations'
 import HomePage from './pages/HomePage'
 import GamesPage from './pages/GamesPage'
+import QuestionSetsPage from './pages/QuestionSetsPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionDashboardPage from './pages/CollectionDashboardPage'
 import CreateCollectionPage from './pages/CreateCollectionPage'
@@ -49,7 +50,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route path="teachers/collections/new" element={<CreateCollectionPage />} />
     <Route path="teachers/collections/:collectionId/edit" element={<CollectionEditorPage />} />
     <Route path="play" element={<GamesPage />} />
-    <Route path="play/:gameName" element={<PlayPage />} />
+    <Route path="play/:gameName" element={<QuestionSetsPage />} />
     <Route path="play/:gameName/:collectionId" element={<PlayPage />} />
     <Route path="*" element={
       <PlaceholderPage title="Ta stran ne obstaja" description="Vrnimo se na otok." backTo="/" backLabel="Začetna stran" />

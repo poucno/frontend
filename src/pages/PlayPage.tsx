@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { findGame } from '../data/games'
 import { DEFAULT_COLLECTION } from '../data/defaultCollection'
+import { findPublicCollection } from '../data/publicCollections'
 import type { GameQuestion, GameResult, GameToParent } from '../data/gameBridge'
-import type { Collection } from '../types/collection'
 
 export default function PlayPage() {
   const { gameName = '', collectionId } = useParams()
@@ -14,13 +14,7 @@ export default function PlayPage() {
   let questions: GameQuestion[] = []
   let error: string | null = null
   try {
-    let collection: Collection | null = null
-    if (collectionId) {
-      collection = null
-    } else {
-      collection = DEFAULT_COLLECTION
-    }
-
+    const collection = collectionId ? findPublicCollection(collectionId) : DEFAULT_COLLECTION
     if (collection) {
       questions = collection.questions
     } else {
@@ -68,7 +62,7 @@ export default function PlayPage() {
   return (
     <section className="play-page" aria-labelledby="play-title">
       <div className="play-heading">
-        <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
+        <Link className="back-link" to={`/play/${game.name}`}><span aria-hidden="true">←</span> Izberi sklop</Link>
         <span id="play-title" className="play-game-title">{game.title}</span>
       </div>
       {error && <p className="error-message">{error}</p>}

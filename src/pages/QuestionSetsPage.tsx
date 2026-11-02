@@ -1,0 +1,39 @@
+import { Link, useParams } from 'react-router-dom'
+import { findGame } from '../data/games'
+import { PUBLIC_COLLECTIONS } from '../data/publicCollections'
+
+export default function QuestionSetsPage() {
+  const { gameName = '' } = useParams()
+  const game = findGame(gameName)
+
+  if (!game) {
+    return (
+      <section className="games-page">
+        <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
+        <h1>Igra ni na voljo</h1>
+        <p className="form-note">Igre »{gameName}« ni mogoče najti.</p>
+      </section>
+    )
+  }
+
+  return (
+    <section className="games-page" aria-labelledby="sets-title">
+      <Link className="back-link" to="/play"><span aria-hidden="true">←</span> Izberi igro</Link>
+      <h1 id="sets-title">{game.title}</h1>
+      <ul className="sets-list">
+        {PUBLIC_COLLECTIONS.map(collection => (
+          <li key={collection.id}>
+            <Link className="set-card" to={`/play/${game.name}/${collection.id}`}>
+              <span className="set-icon" aria-hidden="true">{collection.questions.length}</span>
+              <span className="set-details">
+                <span className="set-name">{collection.name}</span>
+                <span className="set-meta">{collection.subject} · {collection.questions.length} vprašanj</span>
+              </span>
+              <span className="set-arrow" aria-hidden="true">→</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

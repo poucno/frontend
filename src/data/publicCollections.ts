@@ -1,0 +1,74 @@
+import type { Collection } from '../types/collection'
+
+export const PUBLIC_COLLECTIONS: Collection[] = [
+  {
+    id: 'P1',
+    name: 'Poštevanka',
+    subject: 'matematika',
+    description: '',
+    questions: [
+      { question: 'Koliko je 6 × 4?', possibleAnswers: ['24', '18', '30'], answer: '24' },
+      { question: 'Koliko je 7 × 8?', possibleAnswers: ['48', '56', '64'], answer: '56' },
+      { question: 'Koliko je 9 × 3?', possibleAnswers: ['21', '24', '27'], answer: '27' },
+      { question: 'Koliko je 5 × 9?', possibleAnswers: ['40', '45', '54'], answer: '45' },
+      { question: 'Koliko je 12 × 4?', possibleAnswers: ['44', '52', '48'], answer: '48' },
+    ],
+  },
+  {
+    id: 'P2',
+    name: 'Seštevanje in odštevanje',
+    subject: 'matematika',
+    description: '',
+    questions: [
+      { question: 'Koliko je 15 + 27?', possibleAnswers: ['32', '42', '52'], answer: '42' },
+      { question: 'Koliko je 84 − 37?', possibleAnswers: ['47', '53', '41'], answer: '47' },
+      { question: 'Koliko je 56 + 19?', possibleAnswers: ['65', '75', '85'], answer: '75' },
+      { question: 'Koliko je 100 − 48?', possibleAnswers: ['48', '52', '62'], answer: '52' },
+      { question: 'Koliko je 38 + 46?', possibleAnswers: ['74', '84', '94'], answer: '84' },
+    ],
+  },
+  {
+    id: 'P3',
+    name: 'Vesolje',
+    subject: 'naravoslovje',
+    description: '',
+    questions: [
+      { question: 'Kateri planet je najbližje Soncu?', possibleAnswers: ['Merkur', 'Venera', 'Zemlja'], answer: 'Merkur' },
+      { question: 'Kateri planet je znan kot rdeči planet?', possibleAnswers: ['Mars', 'Jupiter', 'Neptun'], answer: 'Mars' },
+      { question: 'Kako se imenuje naša galaksija?', possibleAnswers: ['Rimska cesta', 'Andromeda', 'Orion'], answer: 'Rimska cesta' },
+      { question: 'Koliko planetov ima Osončje?', possibleAnswers: ['8', '7', '9'], answer: '8' },
+      { question: 'Kateri planet je največji?', possibleAnswers: ['Jupiter', 'Saturn', 'Uran'], answer: 'Jupiter' },
+    ],
+  },
+  {
+    id: 'P4',
+    name: 'Živali',
+    subject: 'naravoslovje',
+    description: '',
+    questions: [
+      { question: 'Katera žival je največja na svetu?', possibleAnswers: ['Modri kit', 'Slon', 'Žirafa'], answer: 'Modri kit' },
+      { question: 'Katera ptica ne leti in živi na Antarktiki?', possibleAnswers: ['Pingvin', 'Noj', 'Orel'], answer: 'Pingvin' },
+      { question: 'Koliko nog ima pajek?', possibleAnswers: ['8', '6', '10'], answer: '8' },
+      { question: 'Katera žival je znana kot ladja puščave?', possibleAnswers: ['Kamela', 'Konj', 'Lama'], answer: 'Kamela' },
+      { question: 'Katera je najhitrejša kopenska žival?', possibleAnswers: ['Gepard', 'Lev', 'Konj'], answer: 'Gepard' },
+    ],
+  },
+  {
+    id: 'P5',
+    name: 'Geografija',
+    subject: 'zemljepis',
+    description: '',
+    questions: [
+      { question: 'Katero je glavno mesto Francije?', possibleAnswers: ['Pariz', 'Rim', 'Madrid'], answer: 'Pariz' },
+      { question: 'Katera je najdaljša reka na svetu?', possibleAnswers: ['Nil', 'Amazonka', 'Donava'], answer: 'Nil' },
+      { question: 'Na kateri celini je Mount Everest?', possibleAnswers: ['Azija', 'Evropa', 'Afrika'], answer: 'Azija' },
+      { question: 'Kateri je največji ocean?', possibleAnswers: ['Tihi ocean', 'Atlantski ocean', 'Indijski ocean'], answer: 'Tihi ocean' },
+      { question: 'Katero je glavno mesto Italije?', possibleAnswers: ['Rim', 'Milano', 'Benetke'], answer: 'Rim' },
+    ],
+  },
+]
+
+export function findPublicCollection(id: string | undefined): Collection | undefined {
+  if (!id || !id.startsWith('P')) return undefined
+  return PUBLIC_COLLECTIONS.find(collection => collection.id === id)
+}

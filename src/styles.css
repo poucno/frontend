@@ -125,6 +125,14 @@ main { position: relative; z-index: 1; padding-bottom: 110px; }
 .game-pick:hover { background: #ffffff8c; transform: translateY(-2px); box-shadow: 0 12px 32px #2b718326; }
 .game-thumb { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #0b1220; }
 .game-pick-title { display: block; padding: 14px 18px; font-size: 21px; font-weight: 700; }
+.sets-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; padding: 0; margin: 0; list-style: none; }
+.set-card { display: flex; align-items: center; gap: 18px; padding: 20px; border: 1px solid #d9dfdf; border-radius: 22px; background: #fffdf7; color: #102451; text-decoration: none; box-shadow: 0 8px 28px #2b718315; transition: background 150ms ease, transform 150ms ease; }
+.set-card:hover { background: #e9f5f6; transform: translateY(-2px); }
+.set-icon { display: grid; place-items: center; flex-shrink: 0; width: 56px; height: 56px; border-radius: 16px; background: #baeaff; color: #126397; font-size: 24px; font-weight: 800; }
+.set-details { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; }
+.set-name { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+.set-meta { font-size: 14px; color: #626c82; }
+.set-arrow { font-size: 24px; }
 .back-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 20px; text-underline-offset: 4px; }
 .skip-link { position: fixed; z-index: 10; top: 12px; left: 12px; padding: 12px 20px; border-radius: 12px; background: white; transform: translateY(-200%); }
 .skip-link:focus { transform: translateY(0); }
