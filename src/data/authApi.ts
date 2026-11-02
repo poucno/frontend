@@ -7,7 +7,7 @@ export type AuthSession = {
   expiresAt: number
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL ?? 'https://api.poucno.study').replace(/\/$/, '')
+export const API_BASE = (import.meta.env.VITE_API_URL ?? 'https://api.poucno.study').replace(/\/$/, '')
 const SESSION_KEY = 'otok-znanja.auth.session'
 export const AUTH_EVENT = 'otok-znanja:auth'
 

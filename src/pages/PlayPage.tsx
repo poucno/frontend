@@ -3,28 +3,57 @@ import { Link, useParams } from 'react-router-dom'
 import { findGame } from '../data/games'
 import { DEFAULT_COLLECTION } from '../data/defaultCollection'
 import { findPublicCollection } from '../data/publicCollections'
+import { fetchCollection } from '../data/collectionsApi'
 import type { GameQuestion, GameResult, GameToParent } from '../data/gameBridge'
+
+type RemoteQuestions = { id: string; questions: GameQuestion[] }
+type RemoteError = { id: string; message: string }
+
+function toGameQuestions(detail: { questions: { question: string; possibleAnswers: string[]; answer: string }[] }): GameQuestion[] {
+  return detail.questions.map(question => ({
+    question: question.question,
+    possibleAnswers: question.possibleAnswers,
+    answer: question.answer,
+  }))
+}
 
 export default function PlayPage() {
   const { gameName = '', collectionId } = useParams()
   const game = findGame(gameName)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [result, setResult] = useState<GameResult | null>(null)
+  const [remote, setRemote] = useState<RemoteQuestions | null>(null)
+  const [remoteError, setRemoteError] = useState<RemoteError | null>(null)
 
-  let questions: GameQuestion[] = []
-  let error: string | null = null
-  try {
-    const collection = collectionId ? findPublicCollection(collectionId) : DEFAULT_COLLECTION
-    if (collection) {
-      questions = collection.questions
-    } else {
-      error = 'Zbirke ni mogoče najti.'
-    }
-  } catch {
-    error = 'Zbirke ni mogoče prebrati.'
-  }
+  const localCollection = collectionId ? findPublicCollection(collectionId) : DEFAULT_COLLECTION
 
-  const startMessage = JSON.stringify({ type: 'start', questions })
+  useEffect(() => {
+    if (localCollection || !collectionId) return
+    let cancelled = false
+    fetchCollection(collectionId)
+      .then(detail => {
+        if (cancelled) return
+        if (!detail) {
+          setRemoteError({ id: collectionId, message: 'Zbirke ni mogoče najti.' })
+          return
+        }
+        setRemote({ id: collectionId, questions: toGameQuestions(detail) })
+        setRemoteError(null)
+      })
+      .catch(loadError => {
+        if (cancelled) return
+        setRemoteError({ id: collectionId, message: loadError instanceof Error ? loadError.message : 'Zbirke ni mogoče prebrati.' })
+      })
+    return () => { cancelled = true }
+  }, [collectionId, localCollection])
+
+  const questions = localCollection
+    ? localCollection.questions
+    : remote && remote.id === collectionId ? remote.questions : null
+  const error = localCollection ? null : remoteError && remoteError.id === collectionId ? remoteError.message : null
+  const loading = !localCollection && !questions && !error
+
+  const startMessage = JSON.stringify({ type: 'start', questions: questions ?? [] })
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -66,7 +95,8 @@ export default function PlayPage() {
         <span id="play-title" className="play-game-title">{game.title}</span>
       </div>
       {error && <p className="error-message">{error}</p>}
-      {!error && (
+      {loading && <p className="form-note">Nalaganje …</p>}
+      {!error && !loading && (
         <div className="game-stage">
           <iframe
             ref={iframeRef}
