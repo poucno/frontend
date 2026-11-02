@@ -1,14 +1,17 @@
 import { createBrowserRouter, createRoutesFromElements, Link, NavLink, Outlet, Route, RouterProvider, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { IslandMark, Landscape } from './components/Decorations'
+import { Balloons, IslandMark, Landscape } from './components/Decorations'
+import MotionProvider from './components/MotionProvider'
+import MotionToggle from './components/MotionToggle'
+import { useMotion } from './hooks/useMotion'
 import HomePage from './pages/HomePage'
 import GamesPage from './pages/GamesPage'
 import QuestionSetsPage from './pages/QuestionSetsPage'
+import PlayPage from './pages/PlayPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionDashboardPage from './pages/CollectionDashboardPage'
 import CreateCollectionPage from './pages/CreateCollectionPage'
 import CollectionEditorPage from './pages/CollectionEditorPage'
-import PlayPage from './pages/PlayPage'
 
 function Layout() {
   const { pathname } = useLocation()
@@ -16,6 +19,7 @@ function Layout() {
   const segments = pathname.split('/').filter(Boolean)
   const isGamePage = segments[0] === 'play' && segments.length >= 3
   const previousPath = useRef(pathname)
+  const { motionEnabled } = useMotion()
 
   useEffect(() => {
     if (previousPath.current === pathname) return
@@ -26,19 +30,23 @@ function Layout() {
   }, [pathname])
 
   return (
-    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''} ${isGamePage ? 'play-shell' : ''}`}>
+    <div className={`app-shell ${isTeacherPage ? 'teacher-shell' : 'child-shell'} ${pathname === '/' ? 'landing-shell' : ''} ${isGamePage ? 'play-shell' : ''}`} data-motion={motionEnabled ? 'running' : 'paused'}>
       <a className="skip-link" href="#main-content">Preskoči na vsebino</a>
       <header className="site-header">
         <Link className="brand" to="/" aria-label="Otok znanja – začetna stran">
           <IslandMark />
           <span>Otok znanja</span>
         </Link>
-        <nav aria-label="Glavna navigacija">
-          {isTeacherPage ? <NavLink to="/" end>Začetna stran</NavLink> : <NavLink to="/teachers">Za učitelje</NavLink>}
-        </nav>
+        <div className="header-actions">
+          <MotionToggle />
+          <nav aria-label="Glavna navigacija">
+            {isTeacherPage ? <NavLink to="/" end>Začetna stran</NavLink> : <NavLink to="/teachers">Za učitelje</NavLink>}
+          </nav>
+        </div>
       </header>
       <main id="main-content" tabIndex={-1}><Outlet /></main>
       <Landscape />
+      {isTeacherPage && <div className="teacher-balloons"><Balloons animated interactive /></div>}
     </div>
   )
 }
@@ -60,5 +68,5 @@ const router = createBrowserRouter(createRoutesFromElements(
 ))
 
 export default function App() {
-  return <RouterProvider router={router} />
+  return <MotionProvider><RouterProvider router={router} /></MotionProvider>
 }
