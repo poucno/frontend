@@ -71,6 +71,7 @@ export function trimCollection(collection: Collection): Collection {
       question: question.question.trim(),
       possibleAnswers: question.possibleAnswers.map(answer => answer.trim()),
       answer: question.answer.trim(),
+      hint: question.hint?.trim() || undefined,
     })),
   }
 }

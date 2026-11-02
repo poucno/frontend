@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { findGame } from '../data/games'
-import { PUBLIC_COLLECTIONS, PUBLIC_TOPICS, SUBJECT_IMAGES } from '../data/publicCollections'
+import { PUBLIC_COLLECTIONS, PUBLIC_TOPICS, subjectImage } from '../data/publicCollections'
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
@@ -39,12 +39,12 @@ export default function QuestionSetsPage() {
       {collections.length === 0 && <p className="form-note">Ni sklopov za ta predmet.</p>}
       <ul className="sets-list">
         {collections.map(collection => {
-          const subjectImage = SUBJECT_IMAGES[collection.subject]
+          const image = subjectImage(collection.subject)
           return (
             <li key={collection.id}>
               <Link className="set-card" to={`/play/${game.name}/${collection.id}`}>
                 <span className="set-icon" aria-hidden="true">
-                  {subjectImage && <img className="set-subject-image" src={subjectImage} alt="" loading="lazy" />}
+                  {image && <img className="set-subject-image" src={image} alt="" loading="lazy" />}
                 </span>
                 <span className="set-details">
                   <span className="set-name">{collection.name}</span>

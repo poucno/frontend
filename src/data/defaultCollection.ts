@@ -4,7 +4,9 @@ export const DEFAULT_COLLECTION: Collection = {
   id: 'default',
   name: 'Poštevanka',
   subject: 'matematika',
+  grade: 5,
   description: '',
+  gameId: 'falling_objects',
   questions: [
     {
       question: 'Koliko je 6 × 4?',

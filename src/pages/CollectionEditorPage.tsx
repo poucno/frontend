@@ -19,11 +19,14 @@ function toDraft(detail: CollectionDetail): Collection {
     id: detail.id,
     name: detail.name,
     subject: detail.subject,
+    grade: detail.grade,
     description: detail.description,
+    gameId: detail.gameId,
     questions: detail.questions.map(question => ({
       question: question.question,
       possibleAnswers: question.possibleAnswers,
       answer: question.answer,
+      hint: question.hint,
     })),
   }
 }
@@ -77,12 +80,10 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
   const [errors, setErrors] = useState<CollectionErrors | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [grade, setGrade] = useState(detail.grade)
-  const [gameId, setGameId] = useState(detail.gameId)
   const [games, setGames] = useState<GameOption[] | null>(null)
   const [gamesError, setGamesError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const hasChanges = JSON.stringify(draft) !== JSON.stringify(toDraft(detail)) || grade !== detail.grade || gameId !== detail.gameId
+  const hasChanges = JSON.stringify(draft) !== JSON.stringify(toDraft(detail))
   const { blocker, allowNavigation } = useUnsavedChanges(hasChanges)
 
   useEffect(() => {
@@ -141,12 +142,12 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
       await updateCollection(detail.id, {
         name: trimmed.name,
         subject: trimmed.subject,
-        grade,
+        grade: trimmed.grade,
         description: trimmed.description,
-        gameId,
+        gameId: trimmed.gameId,
         questions: trimmed.questions.map(question => ({
           question: question.question,
-          hint: null,
+          hint: question.hint ?? null,
           possibleAnswers: question.possibleAnswers,
           answer: question.answer,
         })),
@@ -173,13 +174,13 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
         <div className="metadata-fields">
           <div className="form-field">
             <label htmlFor="collection-grade">Razred</label>
-            <select id="collection-grade" value={grade} onChange={event => { setGrade(Number(event.target.value)); setSaveError(null) }}>
+            <select id="collection-grade" value={draft.grade} onChange={event => changeDraft({ ...draft, grade: Number(event.target.value) })}>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(value => <option key={value} value={value}>{value}. razred</option>)}
             </select>
           </div>
           <div className="form-field">
             <label htmlFor="collection-game">Igra</label>
-            <select id="collection-game" value={gameId} onChange={event => { setGameId(event.target.value); setSaveError(null) }}>
+            <select id="collection-game" value={draft.gameId} onChange={event => changeDraft({ ...draft, gameId: event.target.value })}>
               {games?.map(game => <option key={game.id} value={game.id}>{game.title}</option>)}
             </select>
           </div>

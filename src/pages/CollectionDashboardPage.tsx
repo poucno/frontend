@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { QUESTION_FORMS, pluralSl } from '../data/plural'
+import { subjectImage } from '../data/publicCollections'
 import { UnauthorizedError, deleteCollectionById, fetchCollections } from '../data/collectionsApi'
 import type { CollectionSummary } from '../data/collectionsApi'
 
@@ -113,9 +114,13 @@ export default function CollectionDashboardPage() {
       )}
       {collections && collections.length > 0 && (
         <ul className="collection-list">
-          {collections.map(collection => (
+          {collections.map(collection => {
+            const image = subjectImage(collection.subject)
+            return (
             <li key={collection.id} className="collection-card">
-              <span className="collection-icon" aria-hidden="true">{collection.grade}</span>
+              <span className="collection-icon" aria-hidden="true">
+                {image ? <img className="collection-icon-image" src={image} alt="" loading="lazy" /> : collection.grade}
+              </span>
               <div className="collection-details">
                 <h2>{collection.name}</h2>
                 <p>{collection.subject} · {collection.grade}. razred · {collection.questionCount} {pluralSl(collection.questionCount, QUESTION_FORMS)}</p>
@@ -146,7 +151,8 @@ export default function CollectionDashboardPage() {
               </div>
               <span className="sr-only" role="status">{copiedId === collection.id ? 'Povezava kopirana' : ''}</span>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </section>

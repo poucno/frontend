@@ -8,7 +8,9 @@ function makeCollection(): Collection {
     id: 'collection-1',
     name: 'Poštevanka števila 6',
     subject: 'Matematika',
+    grade: 5,
     description: '',
+    gameId: 'falling_objects',
     questions: [{
       question: 'Koliko je 6 × 4?',
       possibleAnswers: ['18', '24', '30'],
