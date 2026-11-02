@@ -28,7 +28,11 @@ export default function PlayPage() {
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
-      if (event.origin !== window.location.origin || event.source !== iframeRef.current?.contentWindow) return
+      const iframe = iframeRef.current
+      if (!iframe || !iframe.src || event.source !== iframe.contentWindow) return
+
+      const gameOrigin = new URL(iframe.src).origin
+      if (event.origin !== gameOrigin) return
 
       let message: GameToParent | null
       try {
@@ -39,7 +43,7 @@ export default function PlayPage() {
       if (!message) return
 
       if (message.type === 'ready') {
-        iframeRef.current?.contentWindow?.postMessage(startMessage, window.location.origin)
+        iframe.contentWindow?.postMessage(startMessage, gameOrigin)
       } else if (message.type === 'result') {
         setResult(message.payload)
       }
@@ -72,7 +76,7 @@ export default function PlayPage() {
             ref={iframeRef}
             className="game-frame"
             title={game.title}
-            src={`/games/${game.name}/index.html`}
+            src={game.url}
             allow="autoplay; fullscreen"
           />
         </div>
