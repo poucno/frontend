@@ -2,6 +2,14 @@ import type { Collection } from '../types/collection'
 
 export const PUBLIC_TOPICS = ['matematika', 'angleščina', 'slovenščina']
 
+export const SUBJECT_IMAGES: Record<string, string> = {
+  matematika: '/subjects/matematika.svg',
+  angleščina: '/subjects/anglescina.svg',
+  slovenščina: '/subjects/slovenscina.svg',
+  naravoslovje: '/subjects/naravoslovje.svg',
+  geografija: '/subjects/geografija.svg',
+}
+
 export const PUBLIC_COLLECTIONS: Collection[] = [
   {
     id: 'P1',
@@ -58,7 +66,7 @@ export const PUBLIC_COLLECTIONS: Collection[] = [
   {
     id: 'P5',
     name: 'Geografija',
-    subject: 'zemljepis',
+    subject: 'geografija',
     description: '',
     questions: [
       { question: 'Katero je glavno mesto Francije?', possibleAnswers: ['Pariz', 'Rim', 'Madrid'], answer: 'Pariz' },
