@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges'
 import { UnauthorizedError, fetchCollection, updateCollection } from '../data/collectionsApi'
 import type { CollectionDetail } from '../data/collectionsApi'
+import { fetchGames } from '../data/gamesApi'
+import type { GameOption } from '../data/gamesApi'
 import { hasValidationErrors, trimCollection, validateCollection } from '../data/collectionValidation'
 import type { CollectionErrors } from '../data/collectionValidation'
 import type { Collection, Question } from '../types/collection'
@@ -75,9 +77,25 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
   const [errors, setErrors] = useState<CollectionErrors | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [grade, setGrade] = useState(detail.grade)
+  const [gameId, setGameId] = useState(detail.gameId)
+  const [games, setGames] = useState<GameOption[] | null>(null)
+  const [gamesError, setGamesError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const hasChanges = JSON.stringify(draft) !== JSON.stringify(toDraft(detail))
+  const hasChanges = JSON.stringify(draft) !== JSON.stringify(toDraft(detail)) || grade !== detail.grade || gameId !== detail.gameId
   const { blocker, allowNavigation } = useUnsavedChanges(hasChanges)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchGames()
+      .then(list => {
+        if (!cancelled) setGames(list)
+      })
+      .catch(loadError => {
+        if (!cancelled) setGamesError(loadError instanceof Error ? loadError.message : 'Iger ni mogoče naložiti.')
+      })
+    return () => { cancelled = true }
+  }, [])
 
   function changeDraft(next: Collection) {
     setDraft(next)
@@ -123,9 +141,9 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
       await updateCollection(detail.id, {
         name: trimmed.name,
         subject: trimmed.subject,
-        grade: detail.grade,
+        grade,
         description: trimmed.description,
-        gameId: detail.gameId,
+        gameId,
         questions: trimmed.questions.map(question => ({
           question: question.question,
           hint: null,
@@ -152,6 +170,21 @@ function CollectionEditor({ detail }: { detail: CollectionDetail }) {
       <h1 id="editor-title">Uredi zbirko</h1>
       <form ref={formRef} className="editor-form" onSubmit={handleSubmit} noValidate>
         <CollectionMetadataFields metadata={draft} errors={errors ?? {}} onChange={metadata => changeDraft({ ...draft, ...metadata })} />
+        <div className="metadata-fields">
+          <div className="form-field">
+            <label htmlFor="collection-grade">Razred</label>
+            <select id="collection-grade" value={grade} onChange={event => { setGrade(Number(event.target.value)); setSaveError(null) }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(value => <option key={value} value={value}>{value}. razred</option>)}
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="collection-game">Igra</label>
+            <select id="collection-game" value={gameId} onChange={event => { setGameId(event.target.value); setSaveError(null) }}>
+              {games?.map(game => <option key={game.id} value={game.id}>{game.title}</option>)}
+            </select>
+          </div>
+        </div>
+        {gamesError && <p className="error-message" role="alert">{gamesError}</p>}
         <div className="question-list">
           {draft.questions.map((question, index) => (
             <QuestionEditor key={index} question={question} index={index} errors={errors?.questionErrors[index]}

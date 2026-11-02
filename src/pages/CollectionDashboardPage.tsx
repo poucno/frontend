@@ -5,6 +5,27 @@ import { QUESTION_FORMS, pluralSl } from '../data/plural'
 import { UnauthorizedError, deleteCollectionById, fetchCollections } from '../data/collectionsApi'
 import type { CollectionSummary } from '../data/collectionsApi'
 
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    try {
+      const area = document.createElement('textarea')
+      area.value = text
+      area.style.position = 'fixed'
+      area.style.opacity = '0'
+      document.body.appendChild(area)
+      area.select()
+      const copied = document.execCommand('copy')
+      document.body.removeChild(area)
+      return copied
+    } catch {
+      return false
+    }
+  }
+}
+
 export default function CollectionDashboardPage() {
   const navigate = useNavigate()
   const { session } = useAuth()
@@ -12,6 +33,7 @@ export default function CollectionDashboardPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
   const newCollectionLink = useRef<HTMLAnchorElement>(null)
 
@@ -57,6 +79,19 @@ export default function CollectionDashboardPage() {
     }
   }
 
+  async function handleCopy(collection: CollectionSummary) {
+    const url = `${window.location.origin}/play/${collection.gameId}/${collection.id}`
+    const copied = await copyText(url)
+    if (!copied) {
+      window.prompt('Kopiraj povezavo:', url)
+      return
+    }
+    setCopiedId(collection.id)
+    window.setTimeout(() => {
+      setCopiedId(current => current === collection.id ? null : current)
+    }, 2000)
+  }
+
   const loading = !collections && !loadError
 
   return (
@@ -87,6 +122,11 @@ export default function CollectionDashboardPage() {
                 {collection.questionCount === 0 && <span className="draft-label">Osnutek brez vprašanj</span>}
               </div>
               <div className="collection-actions">
+                <button className={`button secondary-button icon-button copy-button${copiedId === collection.id ? ' is-copied' : ''}`} type="button" onClick={() => handleCopy(collection)} aria-label={`Kopiraj povezavo do zbirke ${collection.name}`} title={copiedId === collection.id ? 'Kopirano' : 'Kopiraj povezavo'}>
+                  {copiedId === collection.id
+                    ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 13l4 4L19 7" /></svg>
+                    : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4" /><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L13 19" /></svg>}
+                </button>
                 {!loadError && (
                   <Link className="button secondary-button icon-button" to={`/teachers/collections/${encodeURIComponent(collection.id)}/edit`} aria-label={`Uredi zbirko ${collection.name}`} title="Uredi">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -104,6 +144,7 @@ export default function CollectionDashboardPage() {
                   </svg>
                 </button>
               </div>
+              <span className="sr-only" role="status">{copiedId === collection.id ? 'Povezava kopirana' : ''}</span>
             </li>
           ))}
         </ul>
