@@ -36,7 +36,8 @@ export default function CreateCollectionPage() {
       .then(list => {
         if (cancelled) return
         setGames(list)
-        if (list[0]) setFields(previous => previous.gameId ? previous : { ...previous, gameId: list[0]!.id })
+        const preferred = list.find(game => game.id === 'falling_objects') ?? list[0]
+        if (preferred) setFields(previous => previous.gameId ? previous : { ...previous, gameId: preferred.id })
       })
       .catch(error => {
         if (!cancelled) setGamesError(error instanceof Error ? error.message : 'Iger ni mogoče naložiti.')

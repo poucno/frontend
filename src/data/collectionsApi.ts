@@ -1,4 +1,4 @@
-import { authFetch } from './authApi'
+import { API_BASE, authFetch } from './authApi'
 
 export type CollectionSummary = {
   id: string
@@ -92,8 +92,7 @@ export async function fetchCollections(): Promise<CollectionSummary[]> {
 }
 
 export async function fetchCollection(id: string): Promise<CollectionDetail | null> {
-  const response = await authFetch(`/collections/${encodeURIComponent(id)}`)
-  if (response.status === 401) throw new UnauthorizedError()
+  const response = await fetch(`${API_BASE}/collections/${encodeURIComponent(id)}`)
   if (response.status === 404) return null
   if (!response.ok) throw new Error('Zbirke ni mogoče naložiti.')
   return await response.json() as CollectionDetail
