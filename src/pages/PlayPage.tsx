@@ -4,7 +4,7 @@ import { findGame } from '../data/games'
 import { DEFAULT_COLLECTION } from '../data/defaultCollection'
 import { findPublicCollection } from '../data/publicCollections'
 import { fetchCollection } from '../data/collectionsApi'
-import type { GameQuestion, GameResult, GameToParent } from '../data/gameBridge'
+import type { GameQuestion, GameToParent } from '../data/gameBridge'
 
 type RemoteQuestions = { id: string; questions: GameQuestion[] }
 type RemoteError = { id: string; message: string }
@@ -21,7 +21,6 @@ export default function PlayPage() {
   const { gameName = '', collectionId } = useParams()
   const game = findGame(gameName)
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const [result, setResult] = useState<GameResult | null>(null)
   const [remote, setRemote] = useState<RemoteQuestions | null>(null)
   const [remoteError, setRemoteError] = useState<RemoteError | null>(null)
 
@@ -73,9 +72,8 @@ export default function PlayPage() {
 
       if (message.type === 'ready') {
         iframe.contentWindow?.postMessage(startMessage, gameOrigin)
-      } else if (message.type === 'result') {
-        setResult(message.payload)
       }
+      // Game results are intentionally ignored for now.
     }
 
     window.addEventListener('message', handleMessage)
@@ -110,11 +108,6 @@ export default function PlayPage() {
             allow="autoplay; fullscreen"
           />
         </div>
-      )}
-      {result && (
-        <p className="form-note">
-          Rezultat: {result.correct} pravilnih, {result.wrong} napačnih
-        </p>
       )}
     </section>
   )
